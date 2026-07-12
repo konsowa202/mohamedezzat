@@ -25,21 +25,21 @@ export async function submitLead(formData: FormData) {
     .single();
 
   if (resourceError || !resource) {
-    return { error: "Resource not found." };
+    return { error: `Resource error: ${resourceError?.message || "Not found"} (Slug: ${slug})` };
   }
 
   const { error } = await supabase
     .from("leads")
     .insert({
       email,
-      resource_slug: slug,
+      name: `Resource: ${resource.title}`,
     });
 
   if (error) {
     if (error.code === '23505') { // Unique violation
        return { error: "You already have access to this resource. Please check your inbox." };
     }
-    return { error: "Failed to process your request. Please try again." };
+    return { error: `DB Error: ${error.message} (Code: ${error.code})` };
   }
 
   // Send the email if it's a free resource (paid resources are handled differently)
