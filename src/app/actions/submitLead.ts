@@ -1,7 +1,6 @@
 "use server";
 
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 
 export async function submitLead(formData: FormData) {
@@ -13,8 +12,10 @@ export async function submitLead(formData: FormData) {
     return { error: "Email and resource slug are required." };
   }
 
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   // Fetch resource details to send the correct email
   const { data: resource, error: resourceError } = await supabase
