@@ -24,6 +24,15 @@ export default function DashboardClient({
   emailsList
 }: DashboardClientProps) {
   const [activeTab, setActiveTab] = useState("overview");
+  const [newResourceTitle, setNewResourceTitle] = useState("");
+  const [newResourceSlug, setNewResourceSlug] = useState("");
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setNewResourceTitle(val);
+    // Auto-generate slug: lowercase, replace spaces and non-alphanumeric chars with hyphens
+    setNewResourceSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''));
+  };
 
   const tabs = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -203,14 +212,29 @@ export default function DashboardClient({
               // Reset form manually or redirect
               const form = document.getElementById("add-resource-form") as HTMLFormElement;
               if (form) form.reset();
+              setNewResourceTitle("");
+              setNewResourceSlug("");
             }} id="add-resource-form" className="space-y-4">
               <div>
                 <label className="block text-xs font-bold uppercase text-[#5B7186] mb-1">Title</label>
-                <input name="title" required className="w-full bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-[#38BDF8]" />
+                <input 
+                  name="title" 
+                  value={newResourceTitle}
+                  onChange={handleTitleChange}
+                  required 
+                  className="w-full bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-[#38BDF8]" 
+                />
               </div>
               <div>
                 <label className="block text-xs font-bold uppercase text-[#5B7186] mb-1">Slug (URL)</label>
-                <input name="slug" required className="w-full bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-[#38BDF8]" placeholder="e.g. core-protocol" />
+                <input 
+                  name="slug" 
+                  value={newResourceSlug}
+                  onChange={(e) => setNewResourceSlug(e.target.value)}
+                  required 
+                  className="w-full bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-[#38BDF8]" 
+                  placeholder="e.g. core-protocol" 
+                />
               </div>
               <div>
                 <label className="block text-xs font-bold uppercase text-[#5B7186] mb-1">Description</label>
