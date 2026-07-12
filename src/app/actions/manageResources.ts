@@ -27,9 +27,15 @@ export async function addResource(formData: FormData) {
     const fileExt = file.name.split('.').pop();
     const fileName = `${slug}-${Date.now()}.${fileExt}`;
     
+    // Convert Web File to Buffer for the Node.js server
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
     const { error: uploadError } = await supabase.storage
       .from('resources')
-      .upload(fileName, file);
+      .upload(fileName, buffer, {
+        contentType: file.type,
+      });
 
     if (uploadError) {
       console.error("Upload error:", uploadError.message);
