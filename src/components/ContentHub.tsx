@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/i18n/translations";
 import { motion, type Variants } from "framer-motion";
@@ -120,29 +121,15 @@ export const ContentHub: React.FC = () => {
               viewport={{ once: true }}
               className="group aspect-[9/16] md:aspect-[4/5] relative shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#06060A] shadow-card-deep block"
             >
-              {/* Actual Embedded Interactive Players */}
-              {video.embedType === "instagram-iframe" ? (
-                <iframe 
-                  src="https://www.instagram.com/reel/DaQvUOus72P/embed" 
-                  className="w-full h-full border-0 absolute inset-0 z-0"
-                  allowFullScreen 
-                  scrolling="no" 
-                  frameBorder="0"
-                  title={video.title}
+              {/* Image Placeholder instead of Video/Iframe for performance */}
+              <div className="w-full h-full absolute inset-0 z-0 bg-black">
+                <Image
+                  src="/swimming-bg.png"
+                  alt={video.title}
+                  fill
+                  className="w-full h-full object-cover opacity-60"
                 />
-              ) : (
-                <div className="w-full h-full absolute inset-0 z-0 bg-black">
-                  <video 
-                    src={video.videoSrc} 
-                    className="w-full h-full object-cover"
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline 
-                    controls 
-                  />
-                </div>
-              )}
+              </div>
 
               {/* Glowing Mesh Overlay (Visual border glow effect) */}
               <div className="absolute -inset-[50%] opacity-20 pointer-events-none z-10 transition-opacity duration-700" style={{ background: `radial-gradient(ellipse at 50% 50%, ${video.color} 0%, transparent 60%)`, filter: 'blur(30px)' }} />

@@ -25,14 +25,13 @@ export const Hero: React.FC = () => {
       
       {/* ── Background Video & Cinematic Effects ── */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        {/* Background Swimming Video */}
-        <video 
-          src="/bg-swim.mp4" 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
+        {/* Background Swimming Image */}
+        <Image 
+          src="/swimming-bg.png" 
+          alt="Swimming Background"
+          fill
           className="absolute inset-0 w-full h-full object-cover opacity-25"
+          priority
         />
 
         {/* Ambient Dark Overlays & Glow Orbs */}

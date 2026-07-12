@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { submitLead } from "@/app/actions/submitLead";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
+import { ResourceForm } from "@/components/ResourceForm";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -37,37 +37,7 @@ export default async function ResourcePage({ params }: PageProps) {
           </p>
         </div>
 
-        <form action={submitLead} className="space-y-6">
-          <input type="hidden" name="slug" value={resource.slug} />
-          
-          <div>
-            <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wider text-[#5B7186] mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              className="w-full bg-[#06060A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#38BDF8] transition-colors"
-              placeholder="coach@example.com"
-            />
-          </div>
-
-          {/* Turnstile Container */}
-          <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}></div>
-
-          <button
-            type="submit"
-            className={`w-full rounded-xl px-8 py-4 text-sm font-black text-[#06060A] transition-all ${resource.type === 'paid' ? 'bg-amber-500 hover:bg-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-[#38BDF8] hover:bg-[#38BDF8]/90 shadow-glow-blue'}`}
-          >
-            {resource.type === 'paid' ? 'Apply to Purchase' : 'Download Now'}
-          </button>
-          
-          {resource.type === 'paid' && (
-             <p className="text-center text-xs text-[#5B7186] mt-4">We will contact you via email with payment instructions.</p>
-          )}
-        </form>
+        <ResourceForm resource={resource} />
       </div>
       {/* Cloudflare Turnstile Script */}
       <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
