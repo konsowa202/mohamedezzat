@@ -4,26 +4,46 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/i18n/translations";
-import { Menu, X, Globe } from "lucide-react";
+import { Menu, X, Globe, User as UserIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { createClient } from "@/utils/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 export const Navbar: React.FC = () => {
   const { language, toggleLanguage } = useLanguage();
   const t = translations[language].nav;
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createClient();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+
+    // Fetch user
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    fetchUser();
+
+    // Listen to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   const navLinks = [
-    { name: t.about, href: "#about" },
-    { name: t.services, href: "#services" },
-    { name: t.results, href: "#results" },
-    { name: t.contact, href: "#contact" },
+    { name: t.about, href: "/#about" },
+    { name: t.services, href: "/#services" },
+    { name: t.results, href: "/#results" },
+    { name: t.contact, href: "/#contact" },
   ];
 
   return (
@@ -33,11 +53,11 @@ export const Navbar: React.FC = () => {
           className={`mx-auto flex h-20 items-center justify-between gap-3 rounded-full border px-3 transition-all duration-700 sm:h-24 sm:px-6 ${
             isScrolled
               ? "border-[#5B7186]/20 bg-[#06060A]/80 backdrop-blur-xl shadow-glow-blue-sm"
-              : "border-transparent bg-transparent"
+              : "border-transparent bg-[#06060A]/50 backdrop-blur-sm sm:bg-transparent"
           }`}
         >
           {/* Logo */}
-          <a href="#home" className="flex items-center gap-2.5 ps-1 group">
+          <a href="/#home" className="flex items-center gap-2.5 ps-1 group">
             <span className="relative flex items-center justify-center transition-all duration-300 group-hover:scale-105">
               <Image
                 src="/logo.png"
@@ -72,10 +92,28 @@ export const Navbar: React.FC = () => {
               className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[#5B7186]/30 bg-white/5 px-3 text-[11px] font-bold uppercase tracking-wider text-[#e8ecf0] transition-colors hover:border-[#38BDF8] hover:text-white"
             >
               <Globe size={14} />
-              <span>{language === "en" ? "عربي" : "EN"}</span>
+              <span className="hidden sm:inline">{language === "en" ? "عربي" : "EN"}</span>
             </button>
+
+            {user ? (
+              <a
+                href="/dashboard"
+                className="hidden items-center gap-1.5 rounded-full border border-[#38BDF8]/40 bg-[#38BDF8]/10 px-4 py-2 text-xs font-semibold text-[#38BDF8] transition-all hover:border-[#38BDF8] hover:bg-[#38BDF8]/20 sm:inline-flex sm:text-sm shadow-glow-blue-sm"
+              >
+                <UserIcon size={14} />
+                Dashboard
+              </a>
+            ) : (
+              <a
+                href="/login"
+                className="hidden items-center gap-1.5 rounded-full border border-[#5B7186]/40 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition-all hover:border-white/40 hover:bg-white/10 sm:inline-flex sm:text-sm"
+              >
+                Log In
+              </a>
+            )}
+
             <a
-              href="#contact"
+              href="/#contact"
               className="hidden items-center gap-1.5 rounded-full border border-[#5B7186]/40 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition-all hover:border-[#38BDF8] hover:bg-[#38BDF8]/10 sm:inline-flex sm:text-sm shadow-glow-blue-sm hover:shadow-glow-blue"
             >
               {t.book}
@@ -113,8 +151,26 @@ export const Navbar: React.FC = () => {
                   {link.name}
                 </a>
               ))}
+              <div className="h-[1px] bg-white/10 my-2" />
+              {user ? (
+                <a
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-[#38BDF8] font-medium px-4 py-3 rounded-xl hover:bg-white/5 transition-colors flex items-center gap-2"
+                >
+                  <UserIcon size={16} /> Dashboard
+                </a>
+              ) : (
+                <a
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-white font-medium px-4 py-3 rounded-xl hover:bg-white/5 transition-colors"
+                >
+                  Log In
+                </a>
+              )}
               <a
-                href="#contact"
+                href="/#contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="bg-white/10 border border-[#5B7186]/40 text-white text-center px-4 py-3 rounded-xl font-bold mt-2 shadow-glow-blue-sm"
               >

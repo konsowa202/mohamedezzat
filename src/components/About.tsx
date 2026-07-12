@@ -82,39 +82,13 @@ export const About: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* ── Cinematic Stats ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
-          {stats.map((stat, i) => (
-            <motion.div
-              key={i}
-              variants={fadeInUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              custom={3 + i}
-              className="relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/5 p-8 shadow-card-deep group hover:bg-white/[0.04] transition-colors"
-            >
-              <div className="absolute -inset-20 animate-mesh-spin opacity-0 group-hover:opacity-20 transition-opacity duration-700" style={{ background: "radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.4), transparent 60%)" }} />
-              
-              <div className="relative z-10 flex flex-col justify-between h-full">
-                <div className="font-display text-5xl font-black text-white mb-2 text-glow-blue-soft transition-all">
-                  {stat.value}
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-[#e8ecf0]">{stat.label}</div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-[#5B7186] mt-1">{stat.sub}</div>
-                </div>
-              </div>
-              <div className="pointer-events-none absolute inset-0 ring-inset-white" />
-            </motion.div>
-          ))}
-        </div>
-
-        {/* ── Credential Cards ── */}
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* ── Core Pillars Grid ── */}
+        <div className="grid md:grid-cols-2 gap-6 mb-20">
           {[
-            { icon: GraduationCap, title: t.education, desc: t.educationDetail, tag: "ACADEMIC" },
-            { icon: BookOpen, title: t.methodologies, desc: t.credentials, tag: "CERTIFIED" }
+            { icon: Beaker, title: "Science-backed programming", tag: "EVIDENCE-BASED", desc: "No random workouts. Everything is programmed with precise physiological adaptations in mind." },
+            { icon: BookOpen, title: "Strength & Conditioning education", tag: "METHODOLOGY", desc: "Teaching athletes not just how to move, but why they are moving that way." },
+            { icon: Target, title: "Swimming-specific application", tag: "TRANSFER", desc: "Dryland must transfer to the water. We focus on power, starts, and underwater mechanics." },
+            { icon: GraduationCap, title: "Youth development focus", tag: "LONG-TERM", desc: "Protecting young athletes from early specialization and preventing burnout and injury." }
           ].map((item, i) => (
             <motion.div
               key={i}
@@ -122,7 +96,7 @@ export const About: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={6 + i}
+              custom={3 + i}
               className="relative overflow-hidden rounded-3xl bg-[#0a2d54]/20 border border-[#38BDF8]/10 p-8 shadow-card-deep group hover:border-[#38BDF8]/30 transition-all duration-500"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-[#38BDF8]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -145,6 +119,20 @@ export const About: React.FC = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* ── Credentials Footer ── */}
+        <motion.div
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={7}
+            className="text-center max-w-3xl mx-auto"
+        >
+          <p className="text-[#5B7186] text-sm leading-relaxed">
+            <span className="font-bold text-white">Qualifications:</span> {t.educationDetail} {t.credentials}
+          </p>
+        </motion.div>
 
       </div>
     </section>

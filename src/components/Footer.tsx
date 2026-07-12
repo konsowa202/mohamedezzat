@@ -184,6 +184,7 @@ export const Footer: React.FC = () => {
         <div className="mt-20 flex flex-col sm:flex-row justify-between items-center gap-6">
           <p className="font-mono text-[10px] uppercase tracking-widest text-[#5B7186]">
             © {new Date().getFullYear()} MOHAMED EZZAT. {t.rights}
+            <a href="/login" className="ml-4 hover:text-white transition-colors">Admin Access</a>
           </p>
           <div className="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.2em] text-white bg-white/5 px-4 py-2 rounded-full border border-white/5">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse-glow shadow-[0_0_10px_rgba(34,197,94,0.5)]" />

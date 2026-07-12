@@ -87,10 +87,20 @@ export const Hero: React.FC = () => {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7.5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/70 tracking-tight leading-[1.05] mb-10 font-display"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7.5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/70 tracking-tight leading-[1.05] mb-6 font-display"
           >
             {t.headline}
           </motion.h1>
+
+          {/* Subheadline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="text-lg sm:text-xl text-[#5B7186] mb-10 max-w-2xl font-medium leading-relaxed"
+          >
+            {t.subheadline}
+          </motion.p>
 
           {/* CTAs */}
           <motion.div
@@ -100,7 +110,7 @@ export const Hero: React.FC = () => {
             className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
           >
             <a
-              href="#contact"
+              href="/apply"
               className="group relative inline-flex w-full sm:w-auto items-center justify-center gap-2 overflow-hidden rounded-full bg-[#38BDF8] px-8 py-4.5 text-sm font-black text-[#06060A] transition-all hover:bg-[#38BDF8]/90 shadow-glow-blue"
             >
               <Calendar size={16} />
@@ -109,16 +119,16 @@ export const Hero: React.FC = () => {
             </a>
 
             <a
-              href="#content"
+              href="#results"
               className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md px-8 py-4.5 text-sm font-bold text-white hover:bg-white/10 transition-colors"
             >
               <Video size={16} />
-              {language === "en" ? "Watch Video Library" : "مشاهدة مكتبة الفيديو"}
+              {language === "en" ? "See Results" : "مشاهدة النتائج"}
             </a>
           </motion.div>
         </div>
 
-        {/* ── Right Column: Floating Borderless Reel Showcase ── */}
+        {/* ── Right Column: High Performance Visual ── */}
         <div className="lg:col-span-5 flex justify-center w-full relative">
           
           {/* Floating Stat Badge 1 */}
@@ -136,21 +146,17 @@ export const Hero: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Borderless Floating Instagram Reel Card */}
+          {/* High Quality Swimming Graphic */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full max-w-[380px] aspect-[9/16] relative rounded-3xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-white/5"
+            className="w-full max-w-[400px] aspect-[4/5] relative rounded-3xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-white/5 bg-white/5 backdrop-blur-sm"
           >
-            <iframe 
-              src="https://www.instagram.com/reel/DaQvUOus72P/embed" 
-              className="w-full h-full border-0 absolute inset-0"
-              allowFullScreen 
-              scrolling="no" 
-              frameBorder="0"
-              title="Mohamed Ezzat Instagram Reel"
-            />
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#38BDF8]/20 to-transparent mix-blend-overlay" />
+            <div className="absolute inset-0 flex items-center justify-center">
+                <Trophy size={80} className="text-[#38BDF8]/20" />
+            </div>
           </motion.div>
         </div>
 

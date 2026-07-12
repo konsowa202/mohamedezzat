@@ -5,7 +5,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/i18n/translations";
 import { CloudGuide } from "./CloudGuide";
 import { motion, type Variants } from "framer-motion";
-import { Laptop, Users, ShieldAlert, Plus, ArrowRight } from "lucide-react";
+import { Laptop, Users, ShieldAlert, Plus, ArrowRight, Trophy } from "lucide-react";
 
 const cardVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -105,9 +105,9 @@ export const Services: React.FC = () => {
           </motion.p>
         </div>
 
-        {/* ── Cinematic Cards ── */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {servicesList.map((service, i) => (
+        {/* ── Cinematic Cards (Single Path) ── */}
+        <div className="max-w-2xl mx-auto">
+          {servicesList.slice(0,1).map((service, i) => (
             <motion.div
               key={service.id}
               custom={i}
@@ -140,10 +140,10 @@ export const Services: React.FC = () => {
               <div className="relative z-10 flex flex-col flex-grow">
                 <div className="flex items-center justify-between mb-8">
                   <div className={`w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white ${hoveredCard === service.id ? 'shadow-glow-blue-sm text-[#38BDF8]' : ''} transition-all duration-500`}>
-                    {service.icon}
+                    <Trophy size={20} />
                   </div>
                   <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#5B7186] bg-white/5 px-2 py-1 rounded-full border border-white/5">
-                    {service.tag}
+                    ELITE TIER
                   </span>
                 </div>
 
@@ -155,7 +155,7 @@ export const Services: React.FC = () => {
                 </p>
 
                 {/* Feature List */}
-                <div className="space-y-4 mb-8">
+                <div className="space-y-4 mb-8 grid grid-cols-2 gap-x-4 gap-y-2">
                   {service.features.map((feature, idx) => (
                     <div key={idx} className="flex items-start gap-3">
                       <Plus size={14} className="text-[#38BDF8] shrink-0 mt-0.5 opacity-70" />
@@ -165,10 +165,10 @@ export const Services: React.FC = () => {
                 </div>
 
                 {/* Footer action */}
-                <div className="pt-6 border-t border-white/10 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#5B7186] group-hover:text-[#38BDF8] transition-colors">
-                  <span>{language === "en" ? "Explore Program" : "استكشف البرنامج"}</span>
+                <a href="/apply" className="pt-6 border-t border-white/10 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#5B7186] group-hover:text-[#38BDF8] transition-colors">
+                  <span>Apply for Coaching</span>
                   <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                </div>
+                </a>
               </div>
 
               {/* Inset ring overlay */}

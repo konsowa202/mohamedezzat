@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description: "Science-backed Strength & Conditioning coaching for competitive swimmers and finswimmers.",
 };
 
+import { VisitTracker } from "@/components/VisitTracker";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -24,6 +26,7 @@ export default function RootLayout({
       className={`${cairo.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--color-paper)] text-[var(--color-navy)] font-sans">
+        <VisitTracker />
         <LanguageProvider>
           {children}
         </LanguageProvider>

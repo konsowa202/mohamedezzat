@@ -13,26 +13,9 @@ export const LeadMagnet: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      setIsLoading(true);
-      try {
-        const response = await fetch("/api/subscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
-        if (response.ok) {
-          setIsSubmitted(true);
-          setEmail("");
-        }
-      } catch (error) {
-        console.error("Submission failed:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
+    window.location.href = "/resources";
   };
 
   return (
@@ -63,67 +46,21 @@ export const LeadMagnet: React.FC = () => {
             </span>
             
             <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-[1.1] tracking-tight text-glow-blue-soft">
-              {t.headline}
+              Access the Coaching Resources Library
             </h2>
             <p className="text-[#e8ecf0]/80 text-lg leading-relaxed mb-10">
-              {t.subtext}
+              Download proven training protocols, checklists, and guides designed specifically to improve swimming performance.
             </p>
 
             {/* Form */}
             <div className="max-w-md mx-auto">
-              <AnimatePresence mode="wait">
-                {!isSubmitted ? (
-                  <motion.form
-                    key="form"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    onSubmit={handleSubmit}
-                    className="flex flex-col gap-4"
-                  >
-                    <div className="relative group">
-                      <input
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder={t.placeholder}
-                        className="w-full bg-[#06060A]/80 border border-white/10 rounded-2xl py-4 px-6 text-white placeholder:text-[#5B7186] focus:outline-none focus:border-[#38BDF8]/60 focus:ring-1 focus:ring-[#38BDF8]/30 transition-all font-mono text-sm"
-                      />
-                      <div className="absolute inset-0 rounded-2xl ring-inset-white pointer-events-none" />
-                    </div>
-
-                    <motion.button
-                      type="submit"
-                      disabled={isLoading}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full relative group overflow-hidden rounded-2xl bg-white/5 border border-[#38BDF8]/30 py-4 font-bold text-white text-sm tracking-wide transition-all hover:bg-white/10 hover:border-[#38BDF8]/60 shadow-glow-blue-sm hover:shadow-glow-blue flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <span className="absolute inset-0 bg-gradient-to-r from-[#38BDF8]/0 via-[#38BDF8]/10 to-[#38BDF8]/0 opacity-0 group-hover:opacity-100 transition-opacity animate-scanline" />
-                      <Download size={16} />
-                      {isLoading ? (language === "en" ? "Sending..." : "جاري الإرسال...") : t.cta}
-                    </motion.button>
-                    
-                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#5B7186] mt-2">
-                      {language === "en" ? "SECURE · NO SPAM" : "آمن · بدون إزعاج"}
-                    </p>
-                  </motion.form>
-                ) : (
-                  <motion.div
-                    key="success"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-[#06060A]/80 rounded-2xl border border-[#38BDF8]/30 p-10 text-center shadow-glow-blue-sm"
-                  >
-                    <CheckCircle size={48} className="text-[#38BDF8] mx-auto mb-6 drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]" />
-                    <h3 className="text-2xl font-black text-white mb-2">{t.success}</h3>
-                    <p className="text-[#5B7186] font-mono text-[10px] uppercase tracking-widest">
-                      {language === "en" ? "LINK DISPATCHED" : "تم الإرسال"}
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                <a
+                  href="/resources"
+                  className="w-full relative group overflow-hidden rounded-2xl bg-[#38BDF8] border border-[#38BDF8]/30 py-4 font-bold text-[#06060A] text-sm tracking-wide transition-all hover:bg-[#38BDF8]/90 shadow-glow-blue flex items-center justify-center gap-2"
+                >
+                  <Download size={16} />
+                  {language === "en" ? "Browse Library" : "تصفح المكتبة"}
+                </a>
             </div>
           </div>
           <div className="pointer-events-none absolute inset-0 ring-inset-white rounded-[2rem]" />

@@ -213,6 +213,17 @@ export const Results: React.FC = () => {
           </div>
         </div>
 
+        {/* ── Final Conversion CTA ── */}
+        <div className="mt-20 text-center flex flex-col items-center">
+            <h3 className="text-2xl font-bold text-white mb-6">Want similar progress for your swimmer?</h3>
+            <a
+              href="/apply"
+              className="inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-[#38BDF8] px-8 py-4.5 text-sm font-black text-[#06060A] transition-all hover:bg-[#38BDF8]/90 shadow-glow-blue"
+            >
+              Get a Free Performance Assessment
+            </a>
+        </div>
+
       </div>
     </section>
   );
