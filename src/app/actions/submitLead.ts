@@ -58,6 +58,11 @@ export async function submitLead(formData: FormData) {
           },
         });
 
+        const headersList = await import("next/headers").then(m => m.headers());
+        const host = headersList.get("host") || "mohamedezzat-sc.vercel.app";
+        const protocol = host.includes("localhost") ? "http" : "https";
+        const downloadUrl = `${protocol}://${host}/api/resources/${slug}`;
+
         await transporter.sendMail({
           from: `"Mohamed Ezzat" <${emailUser}>`,
           to: email,
@@ -68,8 +73,8 @@ export async function submitLead(formData: FormData) {
               <p>Thank you for requesting <strong>${resource.title}</strong>.</p>
               <p>Here is your requested resource to help you improve your swimming performance.</p>
               <div style="margin: 30px 0; text-align: center;">
-                <a href="${resource.file_url}" style="background-color: #38BDF8; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                  Download Now
+                <a href="${downloadUrl}" style="background-color: #38BDF8; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                  View & Download Guide
                 </a>
               </div>
               <p>If you have any questions or are ready to take your training to the next level, feel free to reach out.</p>
