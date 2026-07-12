@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { updateApplicationStatus } from "@/app/actions/updateApplicationStatus";
 import { addResource, deleteResource } from "@/app/actions/manageResources";
 import { grantUserAsset, revokeUserAsset } from "@/app/actions/manageClients";
-import { Trash2, Users, FileText, ClipboardList, LayoutDashboard, DownloadCloud, ChevronRight } from "lucide-react";
+import { Trash2, Users, FileText, ClipboardList, LayoutDashboard, DownloadCloud, ChevronRight, Loader2 } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 type DashboardClientProps = {
   stats: { visitsCount: number | null; leadsCount: number | null; applicationsCount: number };
@@ -26,6 +27,10 @@ export default function DashboardClient({
   const [activeTab, setActiveTab] = useState("overview");
   const [newResourceTitle, setNewResourceTitle] = useState("");
   const [newResourceSlug, setNewResourceSlug] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const supabase = createClient();
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -206,14 +211,68 @@ export default function DashboardClient({
               <FileText className="text-[#38BDF8]" size={20} />
               Add New Resource
             </h2>
-            {/* IMPORTANT: We add encType="multipart/form-data" to support file uploads */}
-            <form action={async (formData) => {
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (isUploading) return;
+              
+              const form = e.target as HTMLFormElement;
+              const formData = new FormData(form);
+              const fileInput = form.querySelector('input[type="file"]') as HTMLInputElement;
+              const file = fileInput?.files?.[0];
+
+              setIsUploading(true);
+              setUploadProgress(0);
+
+              let file_url = formData.get("file_url") as string;
+
+              // Upload file client-side if a file is selected
+              if (file) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${newResourceSlug}-${Date.now()}.${fileExt}`;
+                
+                // Using Supabase JS client for progress tracking
+                const { error: uploadError } = await supabase.storage
+                  .from('resources')
+                  .upload(fileName, file, {
+                    // This is currently an unsupported prop in standard types for some versions, 
+                    // but we can fake progress or use standard JS XMLHttpRequest if needed.
+                    // For now we will just show a fast indeterminate progress or rely on fast upload.
+                    // Actually, let's just do a smooth CSS progress bar for the upload duration.
+                  });
+
+                if (uploadError) {
+                  console.error("Upload error:", uploadError.message);
+                  alert("Failed to upload file: " + uploadError.message);
+                  setIsUploading(false);
+                  return;
+                }
+
+                const { data: { publicUrl } } = supabase.storage
+                  .from('resources')
+                  .getPublicUrl(fileName);
+                  
+                formData.set("file_url", publicUrl);
+                formData.delete("file"); // Remove the file from formData so server action doesn't re-upload
+              }
+
+              // Fake progress bar animation
+              const interval = setInterval(() => {
+                setUploadProgress(p => p >= 90 ? 90 : p + 10);
+              }, 200);
+
               await addResource(formData);
-              // Reset form manually or redirect
-              const form = document.getElementById("add-resource-form") as HTMLFormElement;
-              if (form) form.reset();
-              setNewResourceTitle("");
-              setNewResourceSlug("");
+              
+              clearInterval(interval);
+              setUploadProgress(100);
+              
+              setTimeout(() => {
+                form.reset();
+                setNewResourceTitle("");
+                setNewResourceSlug("");
+                setIsUploading(false);
+                setUploadProgress(0);
+              }, 500);
+
             }} id="add-resource-form" className="space-y-4">
               <div>
                 <label className="block text-xs font-bold uppercase text-[#5B7186] mb-1">Title</label>
@@ -269,8 +328,30 @@ export default function DashboardClient({
                 <label className="block text-xs font-bold uppercase text-[#5B7186] mb-1">External File URL</label>
                 <input name="file_url" className="w-full bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-[#38BDF8]" placeholder="https://drive.google.com/..." />
               </div>
-              <button type="submit" className="w-full shadow-glow-blue bg-[#38BDF8] text-[#06060A] font-black uppercase tracking-wider rounded-lg py-3 mt-6 hover:bg-[#38BDF8]/90 transition-all">
-                Add Resource
+              <button 
+                type="submit" 
+                disabled={isUploading}
+                className={`w-full shadow-glow-blue bg-[#38BDF8] text-[#06060A] font-black uppercase tracking-wider rounded-lg py-3 mt-6 transition-all relative overflow-hidden ${isUploading ? 'opacity-80 cursor-not-allowed' : 'hover:bg-[#38BDF8]/90'}`}
+              >
+                {/* Progress Bar Background */}
+                {isUploading && (
+                  <div 
+                    className="absolute top-0 left-0 h-full bg-white/30 transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                )}
+                
+                {/* Button Content */}
+                <div className="relative z-10 flex items-center justify-center gap-2">
+                  {isUploading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      {uploadProgress < 100 ? `Uploading... ${uploadProgress}%` : 'Saving...'}
+                    </>
+                  ) : (
+                    'Add Resource'
+                  )}
+                </div>
               </button>
             </form>
           </div>
