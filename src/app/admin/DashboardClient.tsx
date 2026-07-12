@@ -223,55 +223,59 @@ export default function DashboardClient({
               setIsUploading(true);
               setUploadProgress(0);
 
-              let file_url = formData.get("file_url") as string;
+              // Fake progress bar animation DURING the upload process
+              const interval = setInterval(() => {
+                setUploadProgress(p => p >= 90 ? 90 : p + 5);
+              }, 300);
 
-              // Upload file client-side if a file is selected
-              if (file) {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${newResourceSlug}-${Date.now()}.${fileExt}`;
-                
-                // Using Supabase JS client for progress tracking
-                const { error: uploadError } = await supabase.storage
-                  .from('resources')
-                  .upload(fileName, file, {
-                    // This is currently an unsupported prop in standard types for some versions, 
-                    // but we can fake progress or use standard JS XMLHttpRequest if needed.
-                    // For now we will just show a fast indeterminate progress or rely on fast upload.
-                    // Actually, let's just do a smooth CSS progress bar for the upload duration.
-                  });
+              try {
+                let file_url = formData.get("file_url") as string;
 
-                if (uploadError) {
-                  console.error("Upload error:", uploadError.message);
-                  alert("Failed to upload file: " + uploadError.message);
-                  setIsUploading(false);
-                  return;
+                // Upload file client-side if a file is selected
+                if (file) {
+                  const fileExt = file.name.split('.').pop();
+                  const fileName = `${newResourceSlug}-${Date.now()}.${fileExt}`;
+                  
+                  const { error: uploadError } = await supabase.storage
+                    .from('resources')
+                    .upload(fileName, file);
+
+                  if (uploadError) {
+                    throw new Error("Failed to upload file: " + uploadError.message);
+                  }
+
+                  const { data: { publicUrl } } = supabase.storage
+                    .from('resources')
+                    .getPublicUrl(fileName);
+                    
+                  formData.set("file_url", publicUrl);
+                  formData.delete("file"); // Remove the file from formData so server action doesn't re-upload
                 }
 
-                const { data: { publicUrl } } = supabase.storage
-                  .from('resources')
-                  .getPublicUrl(fileName);
-                  
-                formData.set("file_url", publicUrl);
-                formData.delete("file"); // Remove the file from formData so server action doesn't re-upload
-              }
+                const result = await addResource(formData);
+                if (result?.error) {
+                  throw new Error(result.error);
+                }
 
-              // Fake progress bar animation
-              const interval = setInterval(() => {
-                setUploadProgress(p => p >= 90 ? 90 : p + 10);
-              }, 200);
+                clearInterval(interval);
+                setUploadProgress(100);
+                
+                setTimeout(() => {
+                  form.reset();
+                  setNewResourceTitle("");
+                  setNewResourceSlug("");
+                  setIsUploading(false);
+                  setUploadProgress(0);
+                  alert("Resource added successfully!");
+                }, 500);
 
-              await addResource(formData);
-              
-              clearInterval(interval);
-              setUploadProgress(100);
-              
-              setTimeout(() => {
-                form.reset();
-                setNewResourceTitle("");
-                setNewResourceSlug("");
+              } catch (error: any) {
+                console.error("Error saving resource:", error);
+                alert("Error: " + error.message);
+                clearInterval(interval);
                 setIsUploading(false);
                 setUploadProgress(0);
-              }, 500);
+              }
 
             }} id="add-resource-form" className="space-y-4">
               <div>
