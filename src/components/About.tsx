@@ -26,7 +26,7 @@ export const About: React.FC<AboutProps> = ({ aboutData }) => {
   const cloudMsg = translations[language].cloud.about;
 
   const dynamicTitle = (language === 'en' ? aboutData?.title_en : aboutData?.title_ar) || t.title;
-  const dynamicDesc = (language === 'en' ? aboutData?.description_en : aboutData?.description_ar) || t.description;
+  const dynamicDesc = (language === 'en' ? aboutData?.description_en : aboutData?.description_ar) || t.positioning;
 
 
 
