@@ -55,7 +55,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
             {resource.file_url ? (
               isPdf ? (
                 <iframe 
-                  src={`${resource.file_url}#toolbar=0`} 
+                  src={`https://docs.google.com/viewer?url=${encodeURIComponent(resource.file_url)}&embedded=true`} 
                   className="w-full h-full min-h-[70vh] border-0"
                   title={resource.title}
                 />
