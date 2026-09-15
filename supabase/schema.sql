@@ -235,26 +235,30 @@ create policy "Admins can manage user assets" on public.user_assets
     for all using (public.is_admin());
 
 -- ==============================================================================
--- 9. SUPABASE STORAGE BUCKETS (RESOURCES & VIDEOS)
+-- 9. SUPABASE STORAGE BUCKETS (RESOURCES, VIDEOS, RESULTS)
 -- ==============================================================================
--- You must manually create a storage bucket named "resources" and make it public.
--- You must manually create a storage bucket named "client_videos" (can be private or public).
--- If running via SQL, you can execute the following (if storage schema exists):
+-- Automatically create the required buckets
+INSERT INTO storage.buckets (id, name, public) 
+VALUES 
+  ('resources', 'resources', true),
+  ('results', 'results', true),
+  ('client_videos', 'client_videos', false)
+ON CONFLICT (id) DO NOTHING;
 
--- insert into storage.buckets (id, name, public) values ('resources', 'resources', false);
--- insert into storage.buckets (id, name, public) values ('client_videos', 'client_videos', false);
--- 
--- create policy "Public Access to Resources" on storage.objects 
---     for select using (bucket_id = 'resources' and (select role from public.profiles where id = auth.uid()) = 'admin');
--- 
--- create policy "Admins can upload resources" on storage.objects 
---     for insert with check (bucket_id = 'resources' and (select role from public.profiles where id = auth.uid()) = 'admin');
---
--- create policy "Clients can upload videos" on storage.objects 
---     for insert with check (bucket_id = 'client_videos' and auth.uid() is not null);
---
--- create policy "Clients can view own videos and admins view all" on storage.objects 
---     for select using (bucket_id = 'client_videos' and (auth.uid() = owner or (select role from public.profiles where id = auth.uid()) = 'admin'));
+-- Drop old policies if they exist (to allow idempotency)
+DROP POLICY IF EXISTS "Public Access to Resources" ON storage.objects;
+DROP POLICY IF EXISTS "Admins can upload resources" ON storage.objects;
+DROP POLICY IF EXISTS "Admins can manage resources" ON storage.objects;
+DROP POLICY IF EXISTS "Public Access to Results" ON storage.objects;
+DROP POLICY IF EXISTS "Admins can manage results" ON storage.objects;
+
+-- Create Policies for Resources Bucket
+CREATE POLICY "Public Access to Resources" ON storage.objects FOR SELECT USING (bucket_id = 'resources');
+CREATE POLICY "Admins can manage resources" ON storage.objects FOR ALL USING (bucket_id = 'resources' AND public.is_admin());
+
+-- Create Policies for Results Bucket
+CREATE POLICY "Public Access to Results" ON storage.objects FOR SELECT USING (bucket_id = 'results');
+CREATE POLICY "Admins can manage results" ON storage.objects FOR ALL USING (bucket_id = 'results' AND public.is_admin());
 
 -- ==============================================================================
 -- 10. COACHING: WORKOUTS & TRAINING LOGS
