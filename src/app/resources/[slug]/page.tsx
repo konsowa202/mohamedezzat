@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { ResourceForm } from "@/components/ResourceForm";
@@ -20,6 +20,12 @@ export default async function ResourcePage({ params }: PageProps) {
 
   if (!resource) {
     notFound();
+  }
+
+  // If user is already logged in, skip the email capture and redirect to the resource directly
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user) {
+    redirect(`/resource/${resource.slug}`);
   }
 
   return (
