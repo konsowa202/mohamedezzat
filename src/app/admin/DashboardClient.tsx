@@ -4,8 +4,14 @@ import React, { useState } from "react";
 import { updateApplicationStatus } from "@/app/actions/updateApplicationStatus";
 import { addResource, deleteResource } from "@/app/actions/manageResources";
 import { grantUserAsset, revokeUserAsset } from "@/app/actions/manageClients";
-import { Trash2, Users, FileText, ClipboardList, LayoutDashboard, DownloadCloud, ChevronRight, Loader2 } from "lucide-react";
+import { updateAssetStatus } from "@/app/actions/updateAssetStatus";
+import { inviteClient } from "@/app/actions/inviteClient";
+import { createWorkout, deleteWorkout } from "@/app/actions/manageWorkouts";
+import { useActionState } from "react";
+import { Trash2, Users, FileText, ClipboardList, LayoutDashboard, DownloadCloud, ChevronRight, Loader2, Send, Plus, X, Globe, Image as ImageIcon, Save, Check, Copy } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { updateSiteSettings, addClientResult, deleteClientResult } from "@/app/actions/manageContent";
+import { WebsiteCMS } from "./WebsiteCMS";
 
 type DashboardClientProps = {
   stats: { visitsCount: number | null; leadsCount: number | null; applicationsCount: number };
@@ -14,6 +20,10 @@ type DashboardClientProps = {
   profiles: any[];
   userAssets: any[];
   emailsList: string;
+  workouts: any[];
+  techniqueVideos: any[];
+  siteSettings?: any[];
+  clientResults?: any[];
 };
 
 export default function DashboardClient({
@@ -22,13 +32,33 @@ export default function DashboardClient({
   resources,
   profiles,
   userAssets,
-  emailsList
+  emailsList,
+  workouts,
+  techniqueVideos,
+  siteSettings,
+  clientResults
 }: DashboardClientProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const [newResourceTitle, setNewResourceTitle] = useState("");
   const [newResourceSlug, setNewResourceSlug] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
+
+  // Coaching Tab State
+  const [showWorkoutModal, setShowWorkoutModal] = useState(false);
+  const [isCreatingWorkout, setIsCreatingWorkout] = useState(false);
+  const [exercises, setExercises] = useState([{ name: "", sets: "", reps: "", distance: "", rest: "", notes: "" }]);
+
+  // Website Content Tab State
+  const heroSettings = siteSettings?.find(s => s.section_key === 'hero')?.content || { title: "", subtitle: "", cta_text: "" };
+  const [heroTitle, setHeroTitle] = useState(heroSettings.title);
+  const [heroSubtitle, setHeroSubtitle] = useState(heroSettings.subtitle);
+  const [heroCta, setHeroCta] = useState(heroSettings.cta_text);
+  const [isSavingContent, setIsSavingContent] = useState(false);
+  const [isAddingResult, setIsAddingResult] = useState(false);
+
+  const [inviteState, inviteAction, isInviting] = useActionState(inviteClient, { success: false });
 
   const supabase = createClient();
 
@@ -39,11 +69,28 @@ export default function DashboardClient({
     setNewResourceSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''));
   };
 
+  const handleCopyLink = (slug: string) => {
+    const url = `${window.location.origin}/resource/${slug}`;
+    navigator.clipboard.writeText(url);
+    setCopiedLink(slug);
+    setTimeout(() => setCopiedLink(null), 2000);
+  };
+
+  const handleAddExercise = () => setExercises([...exercises, { name: "", sets: "", reps: "", distance: "", rest: "", notes: "" }]);
+  const handleRemoveExercise = (index: number) => setExercises(exercises.filter((_, i) => i !== index));
+  const handleExerciseChange = (index: number, field: string, value: string) => {
+    const newEx = [...exercises];
+    newEx[index] = { ...newEx[index], [field]: value };
+    setExercises(newEx);
+  };
+
   const tabs = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "applications", label: "Applications", icon: ClipboardList },
+    { id: "website", label: "Website", icon: Globe },
     { id: "resources", label: "Resources", icon: FileText },
     { id: "clients", label: "Clients", icon: Users },
+    { id: "coaching", label: "Coaching", icon: Users },
   ];
 
   return (
@@ -151,7 +198,8 @@ export default function DashboardClient({
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-white bg-white/5 px-3 py-2 rounded-lg text-xs border border-white/5 inline-block">{app.primary_goal}</div>
+                      <div className="text-white bg-white/5 px-3 py-2 rounded-lg text-xs border border-white/5 inline-block mb-1">{app.primary_goals || "N/A"}</div>
+                      <div className="text-[10px] text-[#5B7186]">{app.swimming_discipline} • {app.swimming_level}</div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-white font-medium">{app.email}</div>
@@ -201,6 +249,11 @@ export default function DashboardClient({
             </table>
           </div>
         </div>
+      )}
+
+      {/* WEBSITE CONTENT TAB */}
+      {activeTab === "website" && (
+        <WebsiteCMS siteSettings={siteSettings || []} clientResults={clientResults || []} />
       )}
 
       {/* RESOURCES TAB */}
@@ -397,16 +450,31 @@ export default function DashboardClient({
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        {r.file_url ? (
-                           <a href={r.file_url} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-[#38BDF8] hover:text-white transition-colors bg-[#38BDF8]/10 px-3 py-1.5 rounded-lg text-xs font-bold w-fit">
-                             View <ChevronRight size={14} />
-                           </a>
-                        ) : (
-                          <span className="text-xs bg-white/5 px-2 py-1 rounded">No File</span>
-                        )}
+                        <div className="flex items-center gap-2">
+                          <a 
+                            href={`/resource/${r.slug}`}
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="flex items-center gap-1 text-[#38BDF8] hover:text-white transition-colors bg-[#38BDF8]/10 px-3 py-1.5 rounded-lg text-xs font-bold w-fit"
+                            title="View Page"
+                          >
+                            <FileText size={14} /> View
+                          </a>
+                          <button
+                            onClick={() => handleCopyLink(r.slug)}
+                            className="text-[#5B7186] hover:text-white transition-colors flex items-center gap-1 bg-white/5 px-2 py-1.5 rounded-lg text-xs"
+                            title="Copy Link"
+                          >
+                            {copiedLink === r.slug ? (
+                              <><Check size={14} className="text-green-400" /> Copied</>
+                            ) : (
+                              <><Copy size={14} /> Copy Link</>
+                            )}
+                          </button>
+                        </div>
                       </td>
                       <td className="px-6 py-4">
-                        <form action={() => deleteResource(r.id)}>
+                        <form action={async () => { await deleteResource(r.id); }}>
                           <button type="submit" className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
                             <Trash2 size={16} />
                           </button>
@@ -435,14 +503,31 @@ export default function DashboardClient({
       {/* CLIENTS TAB */}
       {activeTab === "clients" && (
         <div className="bg-[#0a2d54]/20 border border-[#38BDF8]/10 rounded-2xl shadow-card-deep overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="p-6 border-b border-white/5 flex justify-between items-center bg-[#06060A]/50">
+          <div className="p-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#06060A]/50">
             <div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <Users className="text-[#38BDF8]" size={20} /> Client Manager
               </h2>
               <p className="text-xs text-[#5B7186] mt-1">Manage user access and subscriptions.</p>
             </div>
+            
+            {/* Invite Client Form */}
+            <form action={inviteAction} className="bg-[#0a2d54]/30 border border-[#38BDF8]/20 p-3 rounded-xl flex flex-col sm:flex-row gap-2 items-center">
+              <input type="text" name="fullName" placeholder="Full Name" required className="bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-white text-xs w-full sm:w-32 focus:border-[#38BDF8]" />
+              <input type="email" name="email" placeholder="Email Address" required className="bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-white text-xs w-full sm:w-48 focus:border-[#38BDF8]" />
+              <button type="submit" disabled={isInviting} className="w-full sm:w-auto bg-[#38BDF8] text-[#06060A] hover:bg-[#38BDF8]/90 font-bold px-4 py-2 rounded-lg text-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
+                {isInviting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                Invite
+              </button>
+            </form>
           </div>
+          
+          {inviteState?.message && (
+            <div className={`p-3 text-xs font-bold text-center border-b border-white/5 ${inviteState.success ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+              {inviteState.message || inviteState.error}
+            </div>
+          )}
+          
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-[#5B7186]">
               <thead className="bg-[#06060A] text-xs uppercase font-bold tracking-wider text-[#5B7186]">
@@ -480,11 +565,27 @@ export default function DashboardClient({
                                   <span className="text-white font-medium text-sm">{asset.asset_name}</span>
                                   {asset.expires_at && <div className="text-[10px] text-[#5B7186] mt-1 ml-16">Expires: {new Date(asset.expires_at).toLocaleDateString()}</div>}
                                 </div>
-                                <form action={async () => {
-                                  await revokeUserAsset(asset.id);
-                                }}>
-                                  <button type="submit" className="text-red-400/50 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100"><Trash2 size={16} /></button>
-                                </form>
+                                <div className="flex items-center gap-2">
+                                  <select 
+                                    className={`text-[9px] uppercase font-bold px-2 py-1 rounded-lg outline-none appearance-none cursor-pointer ${
+                                      asset.status === 'active' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 
+                                      asset.status === 'pending_payment' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 
+                                      'bg-white/5 text-[#5B7186] border border-white/10'
+                                    }`}
+                                    defaultValue={asset.status}
+                                    onChange={(e) => updateAssetStatus(asset.id, e.target.value)}
+                                  >
+                                    <option value="active">Active</option>
+                                    <option value="pending_payment">Pending Payment</option>
+                                    <option value="expired">Expired</option>
+                                    <option value="cancelled">Cancelled</option>
+                                  </select>
+                                  <form action={async () => {
+                                    await revokeUserAsset(asset.id);
+                                  }}>
+                                    <button type="submit" className="text-red-400/50 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition-colors"><Trash2 size={16} /></button>
+                                  </form>
+                                </div>
                               </li>
                             ))}
                           </ul>
@@ -511,10 +612,13 @@ export default function DashboardClient({
                           </div>
                           <div className="flex gap-2">
                             <select name="resource_id" className="w-1/2 bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:border-[#38BDF8]">
-                              <option value="">No PDF attached</option>
+                              <option value="">No Library PDF</option>
                               {resources?.map(r => <option key={r.id} value={r.id} className="truncate">{r.title}</option>)}
                             </select>
                             <input type="date" name="expires_at" className="w-1/2 bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-[#5B7186] text-xs focus:border-[#38BDF8]" />
+                          </div>
+                          <div>
+                             <input type="url" name="custom_file_url" placeholder="Or Custom File URL (e.g. Google Drive link)" className="w-full bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-[#5B7186] text-xs focus:border-[#38BDF8]" />
                           </div>
                           <button type="submit" className="w-full bg-[#38BDF8]/10 text-[#38BDF8] border border-[#38BDF8]/30 hover:bg-[#38BDF8]/20 hover:border-[#38BDF8]/50 text-xs font-bold py-2 rounded-lg transition-all">
                             + Grant Access
@@ -537,6 +641,180 @@ export default function DashboardClient({
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* COACHING TAB */}
+      {activeTab === "coaching" && (
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Workouts Panel */}
+            <div className="bg-[#0a2d54]/20 border border-[#38BDF8]/10 rounded-2xl shadow-card-deep overflow-hidden">
+              <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-white">Workouts</h2>
+                  <p className="text-xs text-[#5B7186] mt-1">Manage training programs.</p>
+                </div>
+                <button 
+                  onClick={() => setShowWorkoutModal(true)}
+                  className="bg-[#38BDF8]/10 text-[#38BDF8] border border-[#38BDF8]/30 hover:bg-[#38BDF8]/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1"
+                >
+                  <Plus size={14} /> Create Workout
+                </button>
+              </div>
+              <div className="p-6">
+                {workouts?.length > 0 ? (
+                  <ul className="space-y-3">
+                    {workouts.map((workout: any) => (
+                      <li key={workout.id} className="bg-[#06060A] border border-white/10 rounded-xl p-4 group">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="font-bold text-white">{workout.title}</div>
+                            <div className="text-xs text-[#5B7186] mt-1 line-clamp-2">{workout.description}</div>
+                          </div>
+                          <form action={async () => { await deleteWorkout(workout.id); }}>
+                            <button type="submit" className="text-[#5B7186] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                              <Trash2 size={16} />
+                            </button>
+                          </form>
+                        </div>
+                        <div className="text-[10px] text-white/50 mt-2 font-mono uppercase tracking-wider">{workout.exercises?.length || 0} EXERCISES</div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-white font-bold">No workouts yet.</p>
+                    <p className="text-sm text-[#5B7186] mt-1">Create your first training plan.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Technique Videos Panel */}
+            <div className="bg-[#0a2d54]/20 border border-[#38BDF8]/10 rounded-2xl shadow-card-deep overflow-hidden">
+              <div className="p-6 border-b border-white/5">
+                <h2 className="text-lg font-bold text-white">Technique Review</h2>
+                <p className="text-xs text-[#5B7186] mt-1">Client video submissions for stroke analysis.</p>
+              </div>
+              <div className="p-6">
+                {techniqueVideos?.length > 0 ? (
+                  <ul className="space-y-3">
+                    {techniqueVideos.map((video: any) => (
+                      <li key={video.id} className="bg-[#06060A] border border-white/10 rounded-xl p-4 flex justify-between items-center">
+                        <div>
+                          <div className="font-bold text-white text-sm">{video.profiles?.full_name || 'Client'}</div>
+                          <div className="text-xs text-[#38BDF8] uppercase tracking-wider font-bold mt-1">{video.stroke_type}</div>
+                          <div className="text-[10px] text-[#5B7186] mt-1">{new Date(video.created_at).toLocaleDateString()}</div>
+                        </div>
+                        <div>
+                          <a href={video.video_url} target="_blank" rel="noreferrer" className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg transition-colors font-medium">
+                            Review
+                          </a>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-white font-bold">No video submissions.</p>
+                    <p className="text-sm text-[#5B7186] mt-1">Clients will upload their swimming videos here.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE WORKOUT MODAL */}
+      {showWorkoutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+          <div className="absolute inset-0 bg-[#06060A]/80 backdrop-blur-sm" onClick={() => !isCreatingWorkout && setShowWorkoutModal(false)} />
+          <div className="relative w-full max-w-2xl bg-[#06060A] border border-white/10 rounded-2xl shadow-card-deep overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 sm:p-6 border-b border-white/5 flex items-center justify-between shrink-0 bg-[#0a2d54]/20">
+              <h3 className="text-lg font-bold text-white">Create New Workout</h3>
+              <button 
+                onClick={() => setShowWorkoutModal(false)}
+                disabled={isCreatingWorkout}
+                className="text-[#5B7186] hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form 
+              className="flex flex-col overflow-hidden"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setIsCreatingWorkout(true);
+                const formData = new FormData(e.currentTarget);
+                formData.set("exercises", JSON.stringify(exercises));
+                await createWorkout(formData);
+                setIsCreatingWorkout(false);
+                setShowWorkoutModal(false);
+                setExercises([{ name: "", sets: "", reps: "", distance: "", rest: "", notes: "" }]);
+              }}
+            >
+              <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 custom-scrollbar">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-[#5B7186] mb-1">Workout Title</label>
+                    <input name="title" required className="w-full bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-[#38BDF8]" placeholder="e.g. Sprint Power Day 1" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-[#5B7186] mb-1">Description (Optional)</label>
+                    <textarea name="description" rows={2} className="w-full bg-[#06060A] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-[#38BDF8] resize-none" placeholder="Goals for this session..." />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-bold text-white">Exercises</h4>
+                    <button type="button" onClick={handleAddExercise} className="text-xs font-bold text-[#38BDF8] hover:text-white transition-colors flex items-center gap-1">
+                      <Plus size={12} /> Add Exercise
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {exercises.map((ex, idx) => (
+                      <div key={idx} className="bg-[#0a2d54]/10 border border-[#38BDF8]/10 rounded-xl p-4 relative group">
+                        {exercises.length > 1 && (
+                          <button type="button" onClick={() => handleRemoveExercise(idx)} className="absolute -top-2 -right-2 bg-[#06060A] border border-red-500/20 text-red-400 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            <X size={12} />
+                          </button>
+                        )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="sm:col-span-2">
+                            <input value={ex.name} onChange={(e) => handleExerciseChange(idx, "name", e.target.value)} required placeholder="Exercise Name (e.g. Back Squat)" className="w-full bg-transparent border-b border-white/10 px-1 py-1 text-white text-sm focus:outline-none focus:border-[#38BDF8]" />
+                          </div>
+                          <div className="flex gap-2">
+                            <input value={ex.sets} onChange={(e) => handleExerciseChange(idx, "sets", e.target.value)} placeholder="Sets (e.g. 4)" className="w-1/2 bg-white/5 border border-white/10 rounded px-2 py-1 text-white text-xs" />
+                            <input value={ex.reps} onChange={(e) => handleExerciseChange(idx, "reps", e.target.value)} placeholder="Reps (e.g. 5)" className="w-1/2 bg-white/5 border border-white/10 rounded px-2 py-1 text-white text-xs" />
+                          </div>
+                          <div className="flex gap-2">
+                            <input value={ex.distance} onChange={(e) => handleExerciseChange(idx, "distance", e.target.value)} placeholder="Distance" className="w-1/2 bg-white/5 border border-white/10 rounded px-2 py-1 text-white text-xs" />
+                            <input value={ex.rest} onChange={(e) => handleExerciseChange(idx, "rest", e.target.value)} placeholder="Rest (e.g. 2m)" className="w-1/2 bg-white/5 border border-white/10 rounded px-2 py-1 text-white text-xs" />
+                          </div>
+                          <div className="sm:col-span-2">
+                            <input value={ex.notes} onChange={(e) => handleExerciseChange(idx, "notes", e.target.value)} placeholder="Coach Notes..." className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-white text-xs italic" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 sm:p-6 border-t border-white/5 shrink-0 flex justify-end gap-3 bg-[#0a2d54]/20">
+                <button type="button" onClick={() => setShowWorkoutModal(false)} disabled={isCreatingWorkout} className="px-4 py-2 text-xs font-bold text-[#5B7186] hover:text-white transition-colors">
+                  Cancel
+                </button>
+                <button type="submit" disabled={isCreatingWorkout} className="bg-[#38BDF8] text-[#06060A] hover:bg-[#38BDF8]/90 px-6 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2">
+                  {isCreatingWorkout ? <Loader2 size={14} className="animate-spin" /> : "Save Workout"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

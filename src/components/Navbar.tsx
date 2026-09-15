@@ -15,6 +15,7 @@ export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
@@ -23,8 +24,18 @@ export const Navbar: React.FC = () => {
 
     // Fetch user
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) console.warn("Could not fetch user:", error.message);
+        setUser(user);
+        
+        if (user) {
+          const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+          if (profile?.role === 'admin') setIsAdmin(true);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch user (network error).");
+      }
     };
     fetchUser();
 
@@ -48,7 +59,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="fixed inset-x-0 top-3 z-50 sm:top-5">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <nav
           className={`mx-auto flex h-20 items-center justify-between gap-3 rounded-full border px-3 transition-all duration-700 sm:h-24 sm:px-6 ${
             isScrolled
@@ -70,7 +81,7 @@ export const Navbar: React.FC = () => {
           </a>
 
           {/* Desktop Navigation */}
-          <ul className="hidden items-center gap-1 md:flex">
+          <ul className="hidden items-center gap-2 lg:flex">
             {navLinks.map((link) => (
               <li key={link.name}>
                 <a
@@ -97,7 +108,7 @@ export const Navbar: React.FC = () => {
 
             {user ? (
               <a
-                href="/dashboard"
+                href={isAdmin ? "/admin" : "/dashboard"}
                 className="hidden items-center gap-1.5 rounded-full border border-[#38BDF8]/40 bg-[#38BDF8]/10 px-4 py-2 text-xs font-semibold text-[#38BDF8] transition-all hover:border-[#38BDF8] hover:bg-[#38BDF8]/20 sm:inline-flex sm:text-sm shadow-glow-blue-sm"
               >
                 <UserIcon size={14} />
@@ -154,7 +165,7 @@ export const Navbar: React.FC = () => {
               <div className="h-[1px] bg-white/10 my-2" />
               {user ? (
                 <a
-                  href="/dashboard"
+                  href={isAdmin ? "/admin" : "/dashboard"}
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-[#38BDF8] font-medium px-4 py-3 rounded-xl hover:bg-white/5 transition-colors flex items-center gap-2"
                 >

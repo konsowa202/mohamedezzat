@@ -7,9 +7,17 @@ import { translations } from "@/i18n/translations";
 import { motion } from "framer-motion";
 import { Trophy, Video, Calendar } from "lucide-react";
 
-export const Hero: React.FC = () => {
+type HeroProps = {
+  heroData?: any;
+};
+
+export const Hero: React.FC<HeroProps> = ({ heroData }) => {
   const { language } = useLanguage();
   const t = translations[language].hero;
+
+  const headlineText = (language === 'en' ? heroData?.title_en : heroData?.title_ar) || t.headline;
+  const subtitleText = (language === 'en' ? heroData?.subtitle_en : heroData?.subtitle_ar) || t.subheadline;
+  const ctaText = (language === 'en' ? heroData?.cta_en : heroData?.cta_ar) || t.cta;
 
   // Use flagcdn.com SVG vector images to support Windows OS cleanly without pixelation
   const countries = [
@@ -72,10 +80,10 @@ export const Hero: React.FC = () => {
               />
             </div>
             <div className="flex flex-col items-start text-left rtl:text-right">
-              <span className="font-mono text-xs sm:text-sm text-[#38BDF8] uppercase tracking-wider font-extrabold mb-1">
+              <span className={`text-xs sm:text-sm text-[#38BDF8] uppercase tracking-wider font-extrabold mb-1 ${language === 'en' ? 'font-mono' : 'font-bold'}`}>
                 {language === "en" ? "Head S&C Coach" : "مدرب الأداء البدني الأول"}
               </span>
-              <span className="font-display text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight text-glow-blue-soft leading-none">
+              <span className={`text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight text-glow-blue-soft leading-tight pb-2 pt-1 ${language === 'en' ? 'font-display' : ''}`}>
                 {language === "en" ? "MOHAMED EZZAT" : "محمد عزت"}
               </span>
             </div>
@@ -86,9 +94,9 @@ export const Hero: React.FC = () => {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7.5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/70 tracking-tight leading-[1.05] mb-6 font-display"
+            className={`text-4xl sm:text-5xl md:text-6xl lg:text-7.5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/70 tracking-tight mb-6 pb-2 ${language === 'en' ? 'font-display leading-[1.05]' : 'leading-tight'}`}
           >
-            {t.headline}
+            {headlineText}
           </motion.h1>
 
           {/* Subheadline */}
@@ -98,7 +106,7 @@ export const Hero: React.FC = () => {
             transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="text-lg sm:text-xl text-[#5B7186] mb-10 max-w-2xl font-medium leading-relaxed"
           >
-            {t.subheadline}
+            {subtitleText}
           </motion.p>
 
           {/* CTAs */}
@@ -113,7 +121,7 @@ export const Hero: React.FC = () => {
               className="group relative inline-flex w-full sm:w-auto items-center justify-center gap-2 overflow-hidden rounded-full bg-[#38BDF8] px-8 py-4.5 text-sm font-black text-[#06060A] transition-all hover:bg-[#38BDF8]/90 shadow-glow-blue"
             >
               <Calendar size={16} />
-              {t.cta}
+              {ctaText}
               <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
             </a>
 
@@ -130,32 +138,35 @@ export const Hero: React.FC = () => {
         {/* ── Right Column: High Performance Visual ── */}
         <div className="lg:col-span-5 flex justify-center w-full relative">
           
-          {/* Floating Stat Badge 1 */}
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -left-6 top-1/4 z-20 hidden sm:flex items-center gap-3 bg-[#06060A]/90 border border-white/10 rounded-2xl p-4 shadow-card-deep backdrop-blur-md"
-          >
-            <div className="w-8 h-8 rounded-full bg-[#38BDF8]/10 flex items-center justify-center text-[#38BDF8] border border-[#38BDF8]/20">
-              <Trophy size={16} />
-            </div>
-            <div>
-              <div className="text-xs font-black text-white">ELITE RESULTS</div>
-              <div className="font-mono text-[9px] text-[#5B7186] uppercase tracking-wider">Dryland S&C</div>
-            </div>
-          </motion.div>
-
-          {/* High Quality Swimming Graphic */}
+          {/* High Quality Swimming Graphic - The Animated Glassy Card */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full max-w-[400px] aspect-[4/5] relative rounded-3xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-white/5 bg-white/5 backdrop-blur-sm"
+            className="w-full max-w-[420px] aspect-[4/5] relative rounded-[2rem] overflow-hidden shadow-[0_40px_100px_rgba(56,189,248,0.15)] border border-white/20 bg-white/5 backdrop-blur-md group"
           >
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#38BDF8]/20 to-transparent mix-blend-overlay" />
-            <div className="absolute inset-0 flex items-center justify-center">
-                <Trophy size={80} className="text-[#38BDF8]/20" />
-            </div>
+            {/* The Image */}
+            <Image
+              src="/hero-glass.png"
+              alt="High Performance Swimming"
+              fill
+              className="object-cover opacity-90 mix-blend-lighten transition-transform duration-1000 group-hover:scale-110"
+              priority
+            />
+            
+            {/* Glassmorphic Overlay Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#0a2d54]/80 via-[#38BDF8]/20 to-transparent mix-blend-overlay" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#06060A] via-transparent to-transparent opacity-80" />
+            
+            {/* Glass Highlight */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none rounded-[2rem]" />
+            
+            {/* Animated Glow inside card */}
+            <motion.div 
+              animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.1, 1] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -bottom-20 -right-20 w-64 h-64 bg-[#38BDF8] rounded-full blur-[100px] opacity-40 mix-blend-screen"
+            />
           </motion.div>
         </div>
 

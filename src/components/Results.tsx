@@ -21,14 +21,14 @@ const cardVariants: Variants = {
   }),
 };
 
-export const Results: React.FC = () => {
+type ResultsProps = {
+  clientResults?: any[];
+};
+
+export const Results: React.FC<ResultsProps> = ({ clientResults = [] }) => {
   const { language } = useLanguage();
   const t = translations[language].results;
   const cloudMsg = translations[language].cloud.results;
-  const [activeCard, setActiveCard] = useState(0);
-
-  const nextCard = () => setActiveCard((prev: number) => (prev + 1) % t.athletes.length);
-  const prevCard = () => setActiveCard((prev: number) => (prev - 1 + t.athletes.length) % t.athletes.length);
 
   return (
     <section id="results" className="relative py-32 bg-[#06060A] overflow-hidden isolate">
@@ -52,8 +52,8 @@ export const Results: React.FC = () => {
             className="flex items-center justify-center gap-3 mb-4"
           >
             <span className="h-px w-4 bg-[#38BDF8]" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#38BDF8]">
-              {language === "en" ? "Track Record" : "سجل الأداء"}
+            <span className={`text-[10px] uppercase tracking-[0.2em] text-[#38BDF8] ${language === 'en' ? 'font-mono' : 'font-bold'}`}>
+              {language === "en" ? "Performance Areas" : "مجالات الأداء"}
             </span>
             <span className="h-px w-4 bg-[#38BDF8]" />
           </motion.div>
@@ -79,9 +79,9 @@ export const Results: React.FC = () => {
           </motion.p>
         </div>
 
-        {/* ── Desktop: Cinematic Grid ── */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {t.athletes.map((athlete, i) => (
+        {/* ── Cinematic Grid ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {t.areas.map((area, i) => (
             <motion.div
               key={i}
               custom={i}
@@ -89,138 +89,76 @@ export const Results: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="group relative overflow-hidden rounded-3xl bg-[#0a2d54]/20 border border-[#38BDF8]/10 p-6 shadow-card-deep hover:border-[#38BDF8]/30 transition-all duration-500 flex flex-col"
+              className="group relative overflow-hidden rounded-3xl bg-[#0a2d54]/20 border border-[#38BDF8]/10 p-8 shadow-card-deep hover:border-[#38BDF8]/30 transition-all duration-500 flex flex-col h-full text-center md:text-left rtl:md:text-right"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-[#38BDF8]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
               <div className="relative z-10 flex flex-col h-full">
-                {/* Meta */}
-                <div className="flex items-center justify-between mb-8">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#5B7186]">
-                    RESULTS · {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <TrendingDown size={14} className="text-[#38BDF8]" />
-                </div>
-
-                {/* Massive Stat */}
-                <div className="mb-8">
-                  <div className="font-display text-5xl font-black text-white leading-none tracking-tight mb-2 text-glow-blue-soft">
-                    {athlete.timeDrop}
-                  </div>
-                  <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#5B7186]">
-                    TIME DROP · {athlete.event}
+                <div className="mb-6 flex justify-center md:justify-start">
+                  <div className="w-12 h-12 rounded-full bg-[#38BDF8]/10 border border-[#38BDF8]/20 flex items-center justify-center text-[#38BDF8]">
+                    <TrendingDown size={24} />
                   </div>
                 </div>
 
-                {/* Times */}
-                <div className="flex items-center gap-3 font-mono text-xs mb-8 p-3 rounded-xl bg-white/[0.03] border border-white/5">
-                  <span className="text-white/40 line-through decoration-red-500/50">{athlete.beforeTime}</span>
-                  <span className="text-[#5B7186]">→</span>
-                  <span className="text-[#38BDF8] font-bold">{athlete.afterTime}</span>
-                </div>
-
-                {/* Quote */}
-                <div className="relative flex-grow border-t border-white/10 pt-6 mt-auto">
-                  <Quote size={12} className="text-[#38BDF8]/50 absolute top-4 left-0" />
-                  <p className="text-[#e8ecf0]/70 text-sm leading-relaxed italic pl-5">
-                    "{athlete.quote}"
-                  </p>
-                  <div className="mt-4 flex items-center gap-2 pl-5">
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#38BDF8]" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-white">
-                      {athlete.name}
-                    </span>
-                  </div>
-                </div>
+                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">
+                  {area.title}
+                </h3>
+                
+                <p className="text-[#e8ecf0]/70 text-base leading-relaxed">
+                  {area.desc}
+                </p>
               </div>
               <div className="pointer-events-none absolute inset-0 ring-inset-white rounded-3xl" />
             </motion.div>
           ))}
         </div>
 
-        {/* ── Mobile: Cinematic Carousel ── */}
-        <div className="md:hidden">
-          <div className="relative">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeCard}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="relative overflow-hidden rounded-3xl bg-[#0a2d54]/20 border border-[#38BDF8]/20 p-8 shadow-card-deep"
-              >
-                {(() => {
-                  const athlete = t.athletes[activeCard];
-                  return (
-                    <div className="relative z-10">
-                      <div className="flex items-center justify-between mb-8">
-                        <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#5B7186]">
-                          RESULTS · {String(activeCard + 1).padStart(2, '0')}
-                        </span>
-                      </div>
-                      <div className="font-display text-6xl font-black text-white leading-none tracking-tight mb-2 text-glow-blue-soft">
-                        {athlete.timeDrop}
-                      </div>
-                      <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#5B7186] mb-8">
-                        TIME DROP · {athlete.event}
-                      </div>
-                      
-                      <div className="flex items-center gap-3 font-mono text-sm mb-8 p-4 rounded-xl bg-white/[0.03] border border-white/5">
-                        <span className="text-white/40 line-through decoration-red-500/50">{athlete.beforeTime}</span>
-                        <span className="text-[#5B7186]">→</span>
-                        <span className="text-[#38BDF8] font-bold">{athlete.afterTime}</span>
-                      </div>
-
-                      <div className="relative pt-6 border-t border-white/10">
-                        <p className="text-[#e8ecf0]/70 text-base leading-relaxed italic">
-                          "{athlete.quote}"
-                        </p>
-                        <div className="mt-4 flex items-center gap-2">
-                          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#38BDF8]" />
-                          <span className="text-xs font-bold uppercase tracking-wider text-white">
-                            {athlete.name}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
-                <div className="pointer-events-none absolute inset-0 ring-inset-white rounded-3xl" />
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Mobile Navigation Controls */}
-            <div className="flex items-center justify-center gap-6 mt-8">
-              <button onClick={prevCard} className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-white/5 transition-colors">
-                <ChevronLeft size={20} />
-              </button>
-              <div className="flex gap-2">
-                {t.athletes.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveCard(i)}
-                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                      i === activeCard ? "bg-[#38BDF8] w-6" : "bg-white/20"
-                    }`}
-                  />
-                ))}
-              </div>
-              <button onClick={nextCard} className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-white/5 transition-colors">
-                <ChevronRight size={20} />
-              </button>
+        {/* ── Dynamic Client Results ── */}
+        {clientResults.length > 0 && (
+          <div className="mt-32 max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h3 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-4">
+                {language === 'en' ? 'Client Success Stories' : 'قصص نجاح المشتركين'}
+              </h3>
             </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {clientResults.slice(0, 3).map((result, idx) => (
+                <motion.div 
+                  key={result.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="bg-[#0a2d54]/20 border border-[#38BDF8]/10 rounded-3xl p-6 shadow-card-deep flex flex-col items-center text-center group hover:border-[#38BDF8]/30 transition-all duration-300"
+                >
+                  <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-2 border-[#38BDF8]/20 group-hover:border-[#38BDF8] transition-colors relative">
+                    <img src={result.image_url} alt={result.client_name} className="w-full h-full object-cover" />
+                  </div>
+                  <h4 className="text-xl font-bold text-white mb-2">{result.client_name}</h4>
+                  <p className="text-[#38BDF8] font-bold text-lg leading-tight">{result.achievement}</p>
+                </motion.div>
+              ))}
+            </div>
+            
+            {clientResults.length > 3 && (
+              <div className="mt-12 text-center">
+                <a href="/results" className="inline-flex items-center gap-2 text-[#38BDF8] hover:text-white font-bold transition-colors">
+                  {language === 'en' ? 'See All Results' : 'مشاهدة كل النتائج'} <ChevronRight size={16} />
+                </a>
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* ── Final Conversion CTA ── */}
-        <div className="mt-20 text-center flex flex-col items-center">
-            <h3 className="text-2xl font-bold text-white mb-6">Want similar progress for your swimmer?</h3>
+        <div className="mt-24 text-center flex flex-col items-center">
+            <h3 className="text-2xl font-bold text-white mb-6">{language === 'en' ? 'Ready to elevate your swimming performance?' : 'هل أنت مستعد لرفع مستوى أداءك في السباحة؟'}</h3>
             <a
               href="/apply"
               className="inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-[#38BDF8] px-8 py-4.5 text-sm font-black text-[#06060A] transition-all hover:bg-[#38BDF8]/90 shadow-glow-blue"
             >
-              Get a Free Performance Assessment
+              {language === 'en' ? 'Apply for Coaching' : 'قدم طلب تدريب'}
             </a>
         </div>
 

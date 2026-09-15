@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Cairo } from "next/font/google";
+import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import { LanguageProvider } from "@/context/LanguageContext";
 import "./globals.css";
 
-const cairo = Cairo({
+const cairo = IBM_Plex_Sans_Arabic({
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-cairo",
-  subsets: ["latin", "arabic"],
+  subsets: ["arabic"],
 });
 
 export const metadata: Metadata = {

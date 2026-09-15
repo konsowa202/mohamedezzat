@@ -20,24 +20,26 @@ export const translations: Record<Language, {
     educationDetail: string;
     credentials: string;
     methodologies: string;
+    pillars: {
+      tag: string;
+      title: string;
+      desc: string;
+    }[];
   };
   services: {
     title: string;
     subtitle: string;
+    oneOnOne: { title: string; desc: string; features: string[] };
     online: { title: string; desc: string; features: string[] };
-    inPerson: { title: string; desc: string; features: string[] };
-    parents: { title: string; desc: string; features: string[] };
+    youth: { title: string; desc: string; features: string[] };
+    team: { title: string; desc: string; features: string[] };
   };
   results: {
     title: string;
     subtitle: string;
-    athletes: {
-      name: string;
-      event: string;
-      timeDrop: string;
-      quote: string;
-      beforeTime: string;
-      afterTime: string;
+    areas: {
+      title: string;
+      desc: string;
     }[];
   };
   contentHub: {
@@ -72,49 +74,64 @@ export const translations: Record<Language, {
       book: "Book a Consult",
     },
     hero: {
-      headline: "Science-Based Strength & Conditioning for Faster Swimmers",
-      subheadline: "Dryland coaching built around starts, turns, speed, and long-term athletic development — not random workouts.",
-      cta: "Get a Free Performance Assessment",
+      headline: "Strength & Conditioning for Faster Swimming",
+      subheadline: "Build the strength, power and athletic qualities that help swimmers improve their starts, turns, underwaters and sprint performance.",
+      cta: "Apply for Coaching",
     },
     about: {
       title: "The Difference",
-      positioning: "Most swimmers don’t need more random exercises. They need a training system built around the qualities that actually transfer to performance.",
-      education: "Academic Foundations",
-      educationDetail: "Degree from Benha University — combining academic rigor with real-world coaching application.",
-      credentials: "Extensively trained in the advanced methodologies of EXOS XPS, IASST S&C, NASM-PES, and CSCS. Mohamed applies elite-level, science-backed principles from these frameworks to every athlete's program, ensuring results driven by proven biomechanics rather than guesswork.",
+      positioning: "The website focuses on swimming performance, not bodybuilding or aesthetics. Swimmers need structural strength and rate of force development (RFD) to excel in the water.",
+      education: "Specialized Training",
+      educationDetail: "Dedicated entirely to the science of swimming performance and athletic development.",
+      credentials: "Evidence-based strength & conditioning methodologies tailored for aquatic athletes.",
       methodologies: "Applied Methodologies",
+      pillars: [
+        { title: "Science-backed programming", tag: "EVIDENCE-BASED", desc: "No random workouts. Everything is programmed with precise physiological adaptations in mind." },
+        { title: "Strength & Conditioning education", tag: "METHODOLOGY", desc: "Teaching athletes not just how to move, but why they are moving that way." },
+        { title: "Swimming-specific application", tag: "TRANSFER", desc: "Dryland must transfer to the water. We focus on power, starts, and underwater mechanics." },
+        { title: "Youth development focus", tag: "LONG-TERM", desc: "Protecting young athletes from early specialization and preventing burnout and injury." }
+      ],
     },
     services: {
       title: "Services",
-      subtitle: "Tailored programs designed for peak aquatic performance",
+      subtitle: "Swimming-specific dryland coaching and programming",
+      oneOnOne: {
+        title: "1:1 Dryland Coaching",
+        desc: "For individual swimmers who need personalized programming and hands-on coaching.",
+        features: ["Individual assessment", "Personalized plan", "Performance testing"],
+      },
       online: {
-        title: "Performance Coaching",
-        desc: "Focus areas focusing directly on Starts, Turns, Underwaters, Speed, Strength, and Injury Resilience.",
-        features: ["Starts & Turns", "Underwaters", "Speed & Power", "Injury Resilience"],
+        title: "Online Coaching",
+        desc: "For swimmers who train at their own facility but need elite-level programming.",
+        features: ["Individual program", "Exercise video library", "Progress tracking"],
       },
-      inPerson: {
-        title: "Performance Coaching",
-        desc: "Focus areas focusing directly on Starts, Turns, Underwaters, Speed, Strength, and Injury Resilience.",
-        features: ["Starts & Turns", "Underwaters", "Speed & Power", "Injury Resilience"],
+      youth: {
+        title: "Youth Swimmer Development",
+        desc: "Focused on younger athletes, prioritizing physical literacy and long-term athletic development.",
+        features: ["Movement quality", "Coordination", "Injury-risk reduction"],
       },
-      parents: {
-        title: "Performance Coaching",
-        desc: "Focus areas focusing directly on Starts, Turns, Underwaters, Speed, Strength, and Injury Resilience.",
-        features: ["Starts & Turns", "Underwaters", "Speed & Power", "Injury Resilience"],
+      team: {
+        title: "Team / Academy Dryland",
+        desc: "For swimming clubs and academies looking to integrate structured S&C.",
+        features: ["Group programming", "Testing batteries", "Team workload monitoring"],
       },
     },
     results: {
-      title: "Results & Proof",
-      subtitle: "Real athletes. Real numbers. No guesswork.",
-      athletes: [
+      title: "What We Work On",
+      subtitle: "Science-based approaches to improve aquatic performance.",
+      areas: [
         {
-          name: "11-year-old swimmer",
-          event: "50m Free LCM",
-          timeDrop: "-7.12s",
-          quote: "Structural strength + rate of force development (power).",
-          beforeTime: "52.00s",
-          afterTime: "44.88s",
-        }
+          title: "Starts & Turns",
+          desc: "Improving rate of force development (RFD) and power output for explosive off-the-block speed and walls.",
+        },
+        {
+          title: "Underwaters & Sprint",
+          desc: "Building core strength and mobility to maintain efficient dolphin kicks and maximum sprint velocities.",
+        },
+        {
+          title: "Injury Risk Reduction",
+          desc: "Strengthening vulnerable joints and ensuring balanced muscular development to keep swimmers healthy.",
+        },
       ],
     },
     contentHub: {
@@ -149,72 +166,63 @@ export const translations: Record<Language, {
       book: "احجز استشارة",
     },
     hero: {
-      headline: "مدرب القوة والتكييف الجاف للسباحين",
-      subheadline: "بدايات أسرع • قوة انفجارية • سباقات أسرع",
-      cta: "احجز استشارة",
+      headline: "التدريب البدني لسباحة أسرع",
+      subheadline: "بناء القوة، الطاقة، والخصائص الرياضية التي تساعد السباحين على تحسين البدايات، الدورانات، تحت الماء، وسرعة السبرنت.",
+      cta: "قدم طلب تدريب",
     },
     about: {
       title: "القصة",
-      positioning: "تدريب مبني على أسس علمية في سوق يفتقر للكفاءة.",
-      education: "الأسس الأكاديمية",
-      educationDetail: "درجة من جامعة بنها — الجمع بين الدقة الأكاديمية والتطبيق العملي في التدريب.",
-      credentials: "تدريب مكثف في المنهجيات المتقدمة لـ EXOS XPS، IASST S&C، NASM-PES، و CSCS. يطبق محمد مبادئ علمية على مستوى النخبة من هذه الأطر في برنامج كل رياضي، لضمان نتائج تعتمد على الميكانيكا الحيوية المثبتة بدلاً من التخمين.",
+      positioning: "الموقع يركز على أداء السباحة، وليس بناء الأجسام. يحتاج السباحون إلى قوة هيكلية ومعدل تطوير القوة للتفوق في الماء.",
+      education: "التدريب المتخصص",
+      educationDetail: "مكرس بالكامل لعلوم أداء السباحة والتطور الرياضي.",
+      credentials: "منهجيات تدريب قوة وتكييف مبنية على الأدلة ومصممة للرياضيين المائيين.",
       methodologies: "المنهجيات التطبيقية",
+      pillars: [
+        { title: "برمجة مبنية على العلم", tag: "علمي", desc: "لا توجد تدريبات عشوائية. كل شيء مبرمج مع وضع التكيفات الفسيولوجية الدقيقة في الاعتبار." },
+        { title: "التعليم والوعي الرياضي", tag: "المنهجية", desc: "تعليم الرياضيين ليس فقط كيفية الحركة، بل لماذا يتحركون بهذه الطريقة." },
+        { title: "تطبيق مخصص للسباحة", tag: "نقل الأداء", desc: "يجب أن ينعكس التدريب الأرضي على الماء. نركز على القوة والبدايات وحركات تحت الماء." },
+        { title: "التركيز على تطوير الناشئين", tag: "طويل الأمد", desc: "حماية الرياضيين الصغار من التخصص المبكر ومنع الإرهاق والإصابات." }
+      ],
     },
     services: {
       title: "الخدمات",
-      subtitle: "برامج مصممة لأقصى أداء مائي",
+      subtitle: "تدريب بدني مخصص للسباحين",
+      oneOnOne: {
+        title: "تدريب بدني 1:1",
+        desc: "للسباحين الأفراد الذين يحتاجون إلى برنامج مخصص وتدريب عملي.",
+        features: ["تقييم فردي", "خطة مخصصة", "اختبارات أداء"],
+      },
       online: {
-        title: "التدريب عن بعد",
-        desc: "برامج مصممة خصيصاً للسباحين التنافسيين. تدرب بتوجيه على مستوى النخبة من أي مكان في العالم.",
-        features: ["كتل تدريبية مخصصة", "تحليل فيديو", "متابعة أسبوعية", "إرشاد غذائي"],
+        title: "تدريب عن بعد",
+        desc: "للسباحين الذين يتدربون في أنديتهم ولكنهم بحاجة إلى برمجة تدريبية احترافية.",
+        features: ["برنامج فردي", "مكتبة فيديو للتمارين", "تتبع التقدم"],
       },
-      inPerson: {
-        title: "التدريب الشخصي",
-        desc: "تدريب عملي على الحوض وتمارين جافة لتحقيق أقصى مكاسب في الأداء وتحسين التقنية.",
-        features: ["جلسات فردية", "تدريب الفريق", "دوائر التمارين", "تحضير المنافسات"],
+      youth: {
+        title: "تطوير السباحين الناشئين",
+        desc: "يركز على الرياضيين الصغار، مع إعطاء الأولوية لمحو الأمية البدنية والتطور الرياضي طويل المدى.",
+        features: ["جودة الحركة", "التوافق العضلي العصبي", "الحد من مخاطر الإصابة"],
       },
-      parents: {
-        title: "لأولياء الأمور",
-        desc: "حماية الرياضيين الصغار: الحد من مخاطر التخصص المبكر وتجنب الإرهاق والإصابات من خلال التدريب البدني السليم.",
-        features: ["تقييم المخاطر", "برامج مناسبة للعمر", "الوقاية من الإصابات", "التطوير طويل المدى"],
+      team: {
+        title: "تدريب بدني للفرق والأكاديميات",
+        desc: "لأندية السباحة والأكاديميات التي تتطلع إلى دمج تدريب قوة وتكييف منظم.",
+        features: ["برمجة جماعية", "بطاريات اختبار", "مراقبة عبء التدريب للفريق"],
       },
     },
     results: {
-      title: "النتائج والأدلة",
-      subtitle: "رياضيون حقيقيون. أرقام حقيقية. بلا تخمين.",
-      athletes: [
+      title: "مجالات العمل",
+      subtitle: "نهج مبني على العلم لتحسين الأداء المائي.",
+      areas: [
         {
-          name: "مازن",
-          event: "100م حرة",
-          timeDrop: "-2.3 ثانية",
-          quote: "انخفض الوقت بمقدار 2.3 ثانية في سباق 100 متر حرة في دورة تدريبية واحدة. فرق لا يصدق في القوة الانفجارية.",
-          beforeTime: "58.4 ثانية",
-          afterTime: "56.1 ثانية",
+          title: "البدايات والدورانات",
+          desc: "تحسين معدل تطوير القوة (RFD) والطاقة الانفجارية لسرعة الانطلاق من المكعب والدفع من الحائط.",
         },
         {
-          name: "يحيى",
-          event: "200م فراشة",
-          timeDrop: "-3.1 ثانية",
-          quote: "لم أتخيل أنني سأكسر حاجز 2:10. برنامج محمد غيّر كل شيء.",
-          beforeTime: "2:12.8",
-          afterTime: "2:09.7",
+          title: "تحت الماء والسرعة",
+          desc: "بناء قوة الجذع والمرونة للحفاظ على ضربات الدولفين الفعالة وسرعات السبرنت القصوى.",
         },
         {
-          name: "ميلينا",
-          event: "50م ظهر",
-          timeDrop: "-1.8 ثانية",
-          quote: "تحولت بدايتي وطوري تحت الماء بالكامل. التدريب الجاف ترجم مباشرة إلى السباق.",
-          beforeTime: "33.2 ثانية",
-          afterTime: "31.4 ثانية",
-        },
-        {
-          name: "الأخوة",
-          event: "سباقات متعددة",
-          timeDrop: "-4.5 ثانية مجتمعة",
-          quote: "كلا الطفلين أسرع وأقوى ويستمتعان بالتدريب مجدداً. كأولياء أمور، لا نستطيع أن نطلب أكثر.",
-          beforeTime: "متنوع",
-          afterTime: "أرقام شخصية جديدة",
+          title: "تقليل مخاطر الإصابة",
+          desc: "تقوية المفاصل المعرضة للإصابة وضمان التطور العضلي المتوازن للحفاظ على صحة السباحين.",
         },
       ],
     },

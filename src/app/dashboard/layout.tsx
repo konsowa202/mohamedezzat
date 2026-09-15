@@ -21,6 +21,10 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
+  if (profile?.role === 'admin') {
+    redirect('/admin');
+  }
+
   return (
     <div className="min-h-screen bg-[#06060A] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8">

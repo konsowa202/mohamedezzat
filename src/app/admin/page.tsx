@@ -12,14 +12,22 @@ export default async function AdminDashboard() {
     { data: applications },
     { data: resources },
     { data: profiles },
-    { data: userAssets }
+    { data: userAssets },
+    { data: workouts },
+    { data: techniqueVideos },
+    { data: siteSettings },
+    { data: clientResults }
   ] = await Promise.all([
     supabase.from("visit_logs").select("*", { count: "exact", head: true }),
     supabase.from("leads").select("email", { count: "exact" }),
     supabase.from("applications").select("*").order("created_at", { ascending: false }),
     supabase.from("resources").select("*").order("created_at", { ascending: false }),
     supabase.from("profiles").select("*"),
-    supabase.from("user_assets").select("*")
+    supabase.from("user_assets").select("*"),
+    supabase.from("workouts").select("*").order("created_at", { ascending: false }),
+    supabase.from("technique_videos").select("*, profiles(full_name)").order("created_at", { ascending: false }),
+    supabase.from("site_settings").select("*"),
+    supabase.from("client_results").select("*").order("display_order", { ascending: true }).order("created_at", { ascending: false })
   ]);
 
   const emailsList = leads?.map((l) => l.email).join(", ") || "";
@@ -37,6 +45,10 @@ export default async function AdminDashboard() {
       profiles={profiles || []}
       userAssets={userAssets || []}
       emailsList={emailsList}
+      workouts={workouts || []}
+      techniqueVideos={techniqueVideos || []}
+      siteSettings={siteSettings || []}
+      clientResults={clientResults || []}
     />
   );
 }

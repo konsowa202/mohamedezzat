@@ -18,6 +18,7 @@ export async function grantUserAsset(formData: FormData) {
   const asset_type = formData.get("asset_type") as string;
   const asset_name = formData.get("asset_name") as string;
   const resource_id = formData.get("resource_id") ? formData.get("resource_id") as string : null;
+  const custom_file_url = formData.get("custom_file_url") ? formData.get("custom_file_url") as string : null;
   const expires_at = formData.get("expires_at") ? new Date(formData.get("expires_at") as string).toISOString() : null;
 
   const { error } = await supabase
@@ -27,6 +28,7 @@ export async function grantUserAsset(formData: FormData) {
       asset_type,
       asset_name,
       resource_id,
+      custom_file_url,
       expires_at
     });
 

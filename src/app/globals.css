@@ -12,6 +12,8 @@
 
   --color-background: var(--color-ink-950);
   --color-foreground: #e8ecf0;
+
+  --font-sans: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ── Grid pattern background ── */
@@ -85,6 +87,11 @@
   100% { transform: translateX(-50%); }
 }
 
+@keyframes marquee-rtl {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(50%); }
+}
+
 @keyframes float-slow {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
@@ -120,6 +127,7 @@
 /* ── Animation utilities ── */
 .animate-mesh-spin { animation: mesh-spin 20s linear infinite; }
 .animate-marquee { animation: marquee 60s linear infinite; }
+[dir="rtl"] .animate-marquee { animation: marquee-rtl 60s linear infinite; }
 .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 .animate-scanline { animation: scanline 8s linear infinite; }
@@ -140,7 +148,6 @@ html {
 body {
   background-color: var(--color-ink-950);
   color: var(--color-foreground);
-  font-family: var(--font-cairo), sans-serif;
   overflow-x: hidden;
 }
 

@@ -13,9 +13,28 @@ export const LeadMagnet: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    window.location.href = "/resources";
+    if (!email) return;
+    
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      
+      if (res.ok) {
+        setIsSubmitted(true);
+      } else {
+        console.error("Failed to subscribe");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -40,27 +59,27 @@ export const LeadMagnet: React.FC = () => {
           <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay noise-overlay" />
           
           <div className="relative z-10 text-center max-w-2xl mx-auto">
-            <span className="inline-flex items-center gap-2 bg-[#38BDF8]/10 text-[#38BDF8] font-mono text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full mb-8 border border-[#38BDF8]/30 shadow-glow-blue-sm">
+            <span className={`inline-flex items-center gap-2 bg-[#38BDF8]/10 text-[#38BDF8] text-[10px] uppercase tracking-[0.2em] px-4 py-1.5 rounded-full mb-8 border border-[#38BDF8]/30 shadow-glow-blue-sm ${language === 'en' ? 'font-mono font-bold' : 'font-bold'}`}>
               <Download size={12} />
               {language === "en" ? "FREE RESOURCE" : "مصدر مجاني"}
             </span>
             
             <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-[1.1] tracking-tight text-glow-blue-soft">
-              Access the Coaching Resources Library
+              {t.headline}
             </h2>
             <p className="text-[#e8ecf0]/80 text-lg leading-relaxed mb-10">
-              Download proven training protocols, checklists, and guides designed specifically to improve swimming performance.
+              {t.subtext}
             </p>
 
-            {/* Form */}
+            {/* Button */}
             <div className="max-w-md mx-auto">
-                <a
-                  href="/resources"
-                  className="w-full relative group overflow-hidden rounded-2xl bg-[#38BDF8] border border-[#38BDF8]/30 py-4 font-bold text-[#06060A] text-sm tracking-wide transition-all hover:bg-[#38BDF8]/90 shadow-glow-blue flex items-center justify-center gap-2"
-                >
-                  <Download size={16} />
-                  {language === "en" ? "Browse Library" : "تصفح المكتبة"}
-                </a>
+              <a
+                href="/resources"
+                className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-[#38BDF8] px-8 py-4 font-bold text-[#06060A] text-sm tracking-wide transition-all hover:bg-[#38BDF8]/90 shadow-glow-blue"
+              >
+                <Download size={16} />
+                {language === "en" ? "Browse Library" : "تصفح المكتبة"}
+              </a>
             </div>
           </div>
           <div className="pointer-events-none absolute inset-0 ring-inset-white rounded-[2rem]" />

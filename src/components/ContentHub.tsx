@@ -143,7 +143,7 @@ export const ContentHub: React.FC = () => {
                   </span>
                   <span>{video.views} VIEWS</span>
                 </div>
-                <div className="font-display text-[15px] font-black leading-tight uppercase tracking-tight text-white">
+                <div className={`text-[15px] font-black leading-tight uppercase tracking-tight text-white ${language === 'en' ? 'font-display' : ''}`}>
                   {video.title}
                 </div>
                 <div className="mt-1 flex items-center gap-1.5 text-[9px] font-medium text-white/50">

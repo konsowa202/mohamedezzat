@@ -94,10 +94,8 @@ export const Footer: React.FC = () => {
             className="flex flex-col sm:flex-row items-center justify-center gap-6"
           >
             <a
-              href="https://wa.me/201271527304"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-white/5 border border-[#38BDF8]/30 px-10 py-5 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#38BDF8]/60 shadow-glow-blue-sm hover:shadow-glow-blue"
+              href="/#contact"
+              className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-white/5 border border-[#38BDF8]/30 px-8 py-4 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#38BDF8]/60 shadow-glow-blue-sm hover:shadow-glow-blue"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-[#38BDF8]/0 via-[#38BDF8]/10 to-[#38BDF8]/0 opacity-0 group-hover:opacity-100 transition-opacity animate-scanline" />
               <Phone size={18} />
@@ -105,10 +103,15 @@ export const Footer: React.FC = () => {
               <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
             </a>
 
-            <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-[#5B7186]">
-              <span className="h-px w-6 bg-[#5B7186]/30" />
-              <span>{language === "en" ? "or WhatsApp" : "أو واتساب"}: +201271527304</span>
-            </div>
+            <a
+              href="https://wa.me/201271527304"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-[#25D366]/10 border border-[#25D366]/30 px-8 py-4 text-sm font-bold text-[#25D366] transition-all hover:bg-[#25D366]/20 hover:border-[#25D366]/60 shadow-[0_0_15px_rgba(37,211,102,0.2)] hover:shadow-[0_0_25px_rgba(37,211,102,0.4)]"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              {language === "en" ? "WhatsApp Me" : "تواصل عبر واتساب"}
+            </a>
           </motion.div>
         </div>
       </div>

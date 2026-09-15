@@ -16,16 +16,19 @@ const fadeInUp: Variants = {
   }),
 };
 
-export const About: React.FC = () => {
+type AboutProps = {
+  aboutData?: any;
+};
+
+export const About: React.FC<AboutProps> = ({ aboutData }) => {
   const { language } = useLanguage();
   const t = translations[language].about;
   const cloudMsg = translations[language].cloud.about;
 
-  const stats = [
-    { value: "50+", label: language === "en" ? "Athletes" : "رياضي", sub: "Trained" },
-    { value: "4", label: language === "en" ? "Frameworks" : "أطر", sub: "Mastered" },
-    { value: "BSc", label: language === "en" ? "Degree" : "درجة", sub: "Benha Univ." },
-  ];
+  const dynamicTitle = (language === 'en' ? aboutData?.title_en : aboutData?.title_ar) || t.title;
+  const dynamicDesc = (language === 'en' ? aboutData?.description_en : aboutData?.description_ar) || t.description;
+
+
 
   return (
     <section id="about" className="relative py-32 bg-[#06060A] overflow-hidden isolate">
@@ -65,7 +68,7 @@ export const About: React.FC = () => {
               custom={1}
               className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-[1.1] tracking-tight"
             >
-              {t.title}
+              {dynamicTitle}
             </motion.h2>
           </div>
 
@@ -76,20 +79,18 @@ export const About: React.FC = () => {
             viewport={{ once: true, margin: "-100px" }}
             custom={2}
           >
-            <p className="text-[#5B7186] text-lg sm:text-xl leading-relaxed border-l border-[#5B7186]/20 pl-6">
-              {t.positioning}
+            <p className="text-[#5B7186] text-lg sm:text-xl leading-relaxed border-l border-[#5B7186]/20 pl-6 rtl:border-l-0 rtl:border-r rtl:pl-0 rtl:pr-6">
+              {dynamicDesc}
             </p>
           </motion.div>
         </div>
 
         {/* ── Core Pillars Grid ── */}
         <div className="grid md:grid-cols-2 gap-6 mb-20">
-          {[
-            { icon: Beaker, title: "Science-backed programming", tag: "EVIDENCE-BASED", desc: "No random workouts. Everything is programmed with precise physiological adaptations in mind." },
-            { icon: BookOpen, title: "Strength & Conditioning education", tag: "METHODOLOGY", desc: "Teaching athletes not just how to move, but why they are moving that way." },
-            { icon: Target, title: "Swimming-specific application", tag: "TRANSFER", desc: "Dryland must transfer to the water. We focus on power, starts, and underwater mechanics." },
-            { icon: GraduationCap, title: "Youth development focus", tag: "LONG-TERM", desc: "Protecting young athletes from early specialization and preventing burnout and injury." }
-          ].map((item, i) => (
+          {t.pillars.map((item, i) => {
+            const icons = [Beaker, BookOpen, Target, GraduationCap];
+            const Icon = icons[i % icons.length];
+            return (
             <motion.div
               key={i}
               variants={fadeInUp}
@@ -103,10 +104,10 @@ export const About: React.FC = () => {
               
               <div className="relative z-10 flex items-start gap-6">
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#06060A] border border-white/10 flex items-center justify-center text-[#38BDF8] shadow-glow-blue-sm">
-                  <item.icon size={20} />
+                  <Icon size={20} />
                 </div>
                 <div>
-                  <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#5B7186] mb-2">{item.tag}</div>
+                  <div className={`text-[9px] uppercase tracking-[0.2em] text-[#5B7186] mb-2 ${language === 'en' ? 'font-mono' : 'font-bold'}`}>{item.tag}</div>
                   <h3 className="text-xl font-bold text-white mb-3 tracking-tight group-hover:text-[#38BDF8] transition-colors">
                     {item.title}
                   </h3>
@@ -117,10 +118,9 @@ export const About: React.FC = () => {
               </div>
               <div className="pointer-events-none absolute inset-0 ring-inset-white rounded-3xl" />
             </motion.div>
-          ))}
+          )})}
         </div>
 
-        {/* ── Credentials Footer ── */}
         <motion.div
             variants={fadeInUp}
             initial="hidden"
@@ -130,7 +130,7 @@ export const About: React.FC = () => {
             className="text-center max-w-3xl mx-auto"
         >
           <p className="text-[#5B7186] text-sm leading-relaxed">
-            <span className="font-bold text-white">Qualifications:</span> {t.educationDetail} {t.credentials}
+            <span className="font-bold text-white">{language === 'en' ? 'Qualifications:' : 'المؤهلات:'}</span> {t.educationDetail} {t.credentials}
           </p>
         </motion.div>
 

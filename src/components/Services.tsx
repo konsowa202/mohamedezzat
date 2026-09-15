@@ -16,13 +16,29 @@ const cardVariants: Variants = {
   }),
 };
 
-export const Services: React.FC = () => {
+type ServicesProps = {
+  servicesData?: any;
+};
+
+export const Services: React.FC<ServicesProps> = ({ servicesData }) => {
   const { language } = useLanguage();
   const t = translations[language].services;
   const cloudMsg = translations[language].cloud.services;
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
+  const dynamicTitle = (language === 'en' ? servicesData?.title_en : servicesData?.title_ar) || t.title;
+
   const servicesList = [
+    {
+      id: "oneOnOne",
+      icon: <Users size={20} />,
+      title: t.oneOnOne.title,
+      desc: t.oneOnOne.desc,
+      features: t.oneOnOne.features,
+      tag: "IN-PERSON",
+      gradient: "from-[#38BDF8] to-[#4996D2]",
+      mesh: "rgba(56, 189, 248, 0.3)",
+    },
     {
       id: "online",
       icon: <Laptop size={20} />,
@@ -30,28 +46,28 @@ export const Services: React.FC = () => {
       desc: t.online.desc,
       features: t.online.features,
       tag: "GLOBAL",
-      gradient: "from-[#38BDF8] to-[#4996D2]",
-      mesh: "rgba(56, 189, 248, 0.3)",
-    },
-    {
-      id: "inPerson",
-      icon: <Users size={20} />,
-      title: t.inPerson.title,
-      desc: t.inPerson.desc,
-      features: t.inPerson.features,
-      tag: "CAIRO",
       gradient: "from-[#4996D2] to-[#072244]",
       mesh: "rgba(73, 150, 210, 0.3)",
     },
     {
-      id: "parents",
+      id: "youth",
       icon: <ShieldAlert size={20} />,
-      title: t.parents.title,
-      desc: t.parents.desc,
-      features: t.parents.features,
-      tag: "ADVISORY",
+      title: t.youth.title,
+      desc: t.youth.desc,
+      features: t.youth.features,
+      tag: "DEVELOPMENT",
       gradient: "from-[#5B7186] to-[#04152e]",
       mesh: "rgba(91, 113, 134, 0.3)",
+    },
+    {
+      id: "team",
+      icon: <Trophy size={20} />,
+      title: t.team.title,
+      desc: t.team.desc,
+      features: t.team.features,
+      tag: "CLUBS",
+      gradient: "from-[#072244] to-[#06060A]",
+      mesh: "rgba(7, 34, 68, 0.3)",
     },
   ];
 
@@ -78,8 +94,8 @@ export const Services: React.FC = () => {
             className="flex items-center justify-center gap-3 mb-4"
           >
             <span className="h-px w-4 bg-[#38BDF8]" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#38BDF8]">
-              {language === "en" ? "Methodology" : "المنهجية"}
+            <span className={`text-[10px] uppercase tracking-[0.2em] text-[#38BDF8] ${language === 'en' ? 'font-mono' : 'font-bold'}`}>
+              {language === "en" ? "Training Systems" : "أنظمة التدريب"}
             </span>
             <span className="h-px w-4 bg-[#38BDF8]" />
           </motion.div>
@@ -91,7 +107,7 @@ export const Services: React.FC = () => {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight"
           >
-            {t.title}
+            {dynamicTitle}
           </motion.h2>
           
           <motion.p
@@ -105,9 +121,9 @@ export const Services: React.FC = () => {
           </motion.p>
         </div>
 
-        {/* ── Cinematic Cards (Single Path) ── */}
-        <div className="max-w-2xl mx-auto">
-          {servicesList.slice(0,1).map((service, i) => (
+        {/* ── Cinematic Cards ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {servicesList.map((service, i) => (
             <motion.div
               key={service.id}
               custom={i}
@@ -140,10 +156,10 @@ export const Services: React.FC = () => {
               <div className="relative z-10 flex flex-col flex-grow">
                 <div className="flex items-center justify-between mb-8">
                   <div className={`w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white ${hoveredCard === service.id ? 'shadow-glow-blue-sm text-[#38BDF8]' : ''} transition-all duration-500`}>
-                    <Trophy size={20} />
+                    {service.icon}
                   </div>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#5B7186] bg-white/5 px-2 py-1 rounded-full border border-white/5">
-                    ELITE TIER
+                  <span className={`text-[9px] uppercase tracking-[0.2em] text-[#5B7186] bg-white/5 px-2 py-1 rounded-full border border-white/5 ${language === 'en' ? 'font-mono' : 'font-bold'}`}>
+                    {service.tag}
                   </span>
                 </div>
 
@@ -155,7 +171,7 @@ export const Services: React.FC = () => {
                 </p>
 
                 {/* Feature List */}
-                <div className="space-y-4 mb-8 grid grid-cols-2 gap-x-4 gap-y-2">
+                <div className="space-y-4 mb-8">
                   {service.features.map((feature, idx) => (
                     <div key={idx} className="flex items-start gap-3">
                       <Plus size={14} className="text-[#38BDF8] shrink-0 mt-0.5 opacity-70" />
