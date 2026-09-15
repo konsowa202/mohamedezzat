@@ -5,15 +5,16 @@ import { notFound } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
-export default async function ResourcePage({ params }: { params: { slug: string } }) {
+export default async function ResourcePage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
   
   // 1. Fetch resource metadata from DB
-  const { data: resource } = await supabase
+  const { data: resource, error } = await supabase
     .from("resources")
     .select("*")
-    .eq("slug", params.slug)
+    .eq("slug", resolvedParams.slug)
     .single();
 
   if (!resource) {
