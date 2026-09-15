@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { PdfViewer } from "@/components/PdfViewer";
 
 export default async function ResourcePage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
@@ -54,11 +55,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
           <div className="flex-grow w-full bg-white/5 border border-white/10 rounded-3xl overflow-hidden shadow-2xl relative min-h-[70vh]">
             {resource.file_url ? (
               isPdf ? (
-                <iframe 
-                  src={`https://docs.google.com/viewer?url=${encodeURIComponent(resource.file_url)}&embedded=true`} 
-                  className="w-full h-full min-h-[70vh] border-0"
-                  title={resource.title}
-                />
+                <PdfViewer url={resource.file_url} />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full min-h-[70vh] p-8 text-center">
                   <div className="w-24 h-24 mb-6 rounded-full bg-[#38BDF8]/20 flex items-center justify-center text-[#38BDF8]">
